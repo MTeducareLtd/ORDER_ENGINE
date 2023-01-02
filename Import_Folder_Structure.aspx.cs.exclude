@@ -1,0 +1,144 @@
+﻿using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.Data;
+using System.Diagnostics;
+using System.Data.SqlClient;
+using System.Configuration;
+using System.Web;
+using System.Web.Security;
+using System.Web.UI;
+using System.Web.UI.WebControls;
+using System.Web.UI.WebControls.WebParts;
+using System.Web.UI.HtmlControls;
+using System.IO;
+using ShoppingCart.BL;
+using Encryption.BL;
+using ChequeReturnRequest;
+using ExportFolderStructureFiles;
+
+public partial class Import_Folder_Structure : System.Web.UI.Page
+{
+    protected void Page_Load(object sender, EventArgs e)
+    {
+        if (!IsPostBack)
+        {
+            StartProcees();
+
+        }
+   }
+
+    protected void btnsaveUploadpic_ServerClick(object sender, System.EventArgs e)
+    {
+        try
+        {
+            string[] fileArray = Directory.GetDirectories(@"C:\Users\ADMIN\Desktop\Course");
+            for (int i = 0; i < fileArray.Length; i++)
+            {
+
+                Console.WriteLine(fileArray[i]);
+            }
+            Console.ReadLine();
+
+            string[] filePaths = Directory.GetFiles(@"C:\Users\ADMIN\Desktop\Course");
+            string[] folders = System.IO.Directory.GetDirectories(@"C:\Users\ADMIN\Desktop\Course", "*", System.IO.SearchOption.AllDirectories);
+
+        }
+        catch (Exception ex)
+        {
+
+          
+        }
+    }
+
+    public static void StartProcees()
+        {
+            // replace your base path where to get files list
+            string baseDirectory = @"C:\MyFolder\";
+
+            // get list of files from the specific directory
+            string[] allFiles = Directory.GetFiles(baseDirectory, "*.*", SearchOption.AllDirectories).OrderByDescending(x => x.Split('\\').Length).ToArray();
+
+            if (allFiles.Count() > 0)
+            {
+                // replace your target path where to export files list
+                string baseExportDirectory = @"C:\MyExportFolder\";
+                string baseExportPath = baseExportDirectory + "FilesList.csv";
+
+                PreparingFilesList(allFiles, baseDirectory, baseExportDirectory, baseExportPath);
+            }
+        }
+
+        private static void PreparingFilesList(string[] allFiles, string baseDirectory, string baseExportDirectory, string baseExportPath)
+        {
+            var csvExport = new CsvExport();
+            try
+            {
+                int fileCounter = 0;
+                foreach (string file in allFiles)
+                {
+                    fileCounter++;
+                    csvExport.AddRow();
+
+                    string fileName = Path.GetFileName(file);
+                    string dirPath = GetNeededDirectoriesFromPath(baseDirectory, file);
+
+                    int dirCounter = 0;
+                    var deepDirectories = dirPath.Split('\\');
+                    foreach (string dir in deepDirectories)
+                    {
+                        dirCounter++;
+                        if (dir.IndexOf(fileName) == -1)
+                        {
+                            csvExport["Dir " + dirCounter] = dir;
+                        }
+                    }
+                    csvExport["File Name"] = fileName;
+                }
+
+                // create export directory if not exists
+                if (!Directory.Exists(baseExportDirectory))
+                    Directory.CreateDirectory(baseExportDirectory);
+
+                // delete old files if already exists
+                if (File.Exists(baseExportPath))
+                    File.Delete(baseExportPath);
+
+                // start exporting files to export directory
+                csvExport.ExportToFile(baseExportPath);
+            }
+            catch (UnauthorizedAccessException UAEx)
+            {
+                Console.WriteLine(UAEx.Message);
+            }
+            catch (PathTooLongException PathEx)
+            {
+                Console.WriteLine(PathEx.Message);
+            }
+        }
+
+        private static string GetNeededDirectoriesFromPath(string basePath, string path)
+        {
+            // normalize paths
+            basePath = Path.GetFullPath(basePath);
+            path = Path.GetFullPath(path);
+
+            // same path case
+            if (basePath == path)
+                return string.Empty;
+
+            // path is not contained in basePath case
+            if (!path.StartsWith(basePath))
+                return string.Empty;
+
+            // extract relative path
+            if (basePath[basePath.Length - 1] != Path.DirectorySeparatorChar)
+            {
+                basePath += Path.DirectorySeparatorChar;
+            }
+
+            return path.Substring(basePath.Length);
+        }
+    }
+
+}

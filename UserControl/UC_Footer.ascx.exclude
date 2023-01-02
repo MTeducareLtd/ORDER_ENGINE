@@ -1,0 +1,16 @@
+﻿<%@ Control Language="C#" AutoEventWireup="true" CodeFile="UC_Footer.ascx.cs" Inherits="UserControl_UC_Footer" %>
+
+
+
+<!-- BEGIN FOOTER -->
+<div class="footer">
+	<div class="footer-inner">
+		 2014 &copy; MTEducare Ltd.
+	</div>
+	<div class="footer-tools">
+		<span class="go-top">
+			<i class="fa fa-angle-up"></i>
+		</span>
+	</div>
+</div>
+<!-- END FOOTER -->

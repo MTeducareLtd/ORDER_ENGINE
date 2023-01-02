@@ -1,0 +1,316 @@
+﻿<?xml version="1.0"?>
+<doc>
+<assembly>
+<name>
+TimePicker
+</name>
+</assembly>
+<members>
+<member name="F:TimePicker.TimeExtender.ibtnShowPicker">
+	<summary>
+ibtnShowPicker control.
+</summary>
+	<remarks>
+Auto-generated field.
+To modify move field declaration from designer file to code-behind file.
+</remarks>
+</member><member name="F:TimePicker.TimeExtender.PopupControlExtender_Time">
+	<summary>
+PopupControlExtender_Time control.
+</summary>
+	<remarks>
+Auto-generated field.
+To modify move field declaration from designer file to code-behind file.
+</remarks>
+</member><member name="F:TimePicker.TimeExtender.datalistTimes">
+	<summary>
+datalistTimes control.
+</summary>
+	<remarks>
+Auto-generated field.
+To modify move field declaration from designer file to code-behind file.
+</remarks>
+</member><member name="P:TimePicker.My.MyWebExtension.Application">
+	<summary>
+ Returns information about the current application.
+ </summary>
+</member><member name="P:TimePicker.My.MyWebExtension.Computer">
+	<summary>
+ Returns information about the host computer.
+ </summary>
+</member><member name="P:TimePicker.My.MyWebExtension.User">
+	<summary>
+ Returns information for the current Web user.
+ </summary>
+</member><member name="P:TimePicker.My.MyWebExtension.Request">
+	<summary>
+ Returns Request object.
+ </summary>
+</member><member name="P:TimePicker.My.MyWebExtension.Response">
+	<summary>
+ Returns Response object.
+ </summary>
+</member><member name="P:TimePicker.My.MyWebExtension.Log">
+	<summary>
+ Returns the Asp log object.
+ </summary>
+</member><member name="P:TimePicker.My.MyWebExtension.WebServices">
+	<summary>
+ Provides access to WebServices added to this project.
+ </summary>
+</member><member name="T:TimePicker.My.MyWebExtension">
+	<summary>
+ Module used to define the properties that are available in the My Namespace for Web projects.
+ </summary>
+	<remarks></remarks>
+</member><member name="P:TimePicker.My.Resources.Resources.ResourceManager">
+	<summary>
+  Returns the cached ResourceManager instance used by this class.
+</summary>
+</member><member name="P:TimePicker.My.Resources.Resources.Culture">
+	<summary>
+  Overrides the current thread's CurrentUICulture property for all
+  resource lookups using this strongly typed resource class.
+</summary>
+</member><member name="T:TimePicker.My.Resources.Resources">
+	<summary>
+  A strongly-typed resource class, for looking up localized strings, etc.
+</summary>
+</member><member name="M:TimePicker.TimeExtender.ResolveControlURL(System.String)">
+	<summary>   
+ Resolves Style Sheet URL.
+ </summary>
+	<remarks>Allows parent page to find sytle sheet</remarks>
+</member><member name="M:TimePicker.TimeExtender.CreateDataSource">
+	<summary>   
+ Populate Dateset with Times
+ </summary>
+	<remarks>Handles 12 Hour Clock or 24 Hour clock</remarks>
+</member><member name="M:TimePicker.TimeExtender.datalistTimes_OnItemDataBound(System.Object,System.Web.UI.WebControls.DataListItemEventArgs)">
+	<summary>   
+ DataList OnItemDataBound sets picker buttons.
+ </summary>
+	<remarks>Sets header and detail link buttons in Datalist</remarks>
+</member><member name="M:TimePicker.TimeExtender.BindDataSource">
+	<summary>   
+ DataList bind.
+ </summary>
+	<remarks></remarks>
+</member><member name="M:TimePicker.TimeExtender.lbtnTime_Onclick(System.Object,System.Web.UI.WebControls.CommandEventArgs)">
+	<summary>   
+ Return time to parent control after Time clicked.
+ </summary>
+	<remarks></remarks>
+</member><member name="M:TimePicker.TimeExtender.lbtnHeaderTime_OnCommand(System.Object,System.Web.UI.WebControls.CommandEventArgs)">
+	<summary>   
+ Time Button Event.
+ </summary>
+	<remarks></remarks>
+</member><member name="M:TimePicker.TimeExtender.lbtnHeaderAM_OnCommand(System.Object,System.Web.UI.WebControls.CommandEventArgs)">
+	<summary>   
+ AM Button Event.
+ </summary>
+	<remarks></remarks>
+</member><member name="M:TimePicker.TimeExtender.lbtnHeaderPM_OnCommand(System.Object,System.Web.UI.WebControls.CommandEventArgs)">
+	<summary>   
+ PM Button Event.
+ </summary>
+	<remarks></remarks>
+</member><member name="M:TimePicker.TimeExtender.CommitTime(System.String)">
+	<summary>   
+ Return time to parent control after Time clicked.
+ </summary>
+	<remarks>Must find the parent on main page if using button</remarks>
+</member><member name="M:TimePicker.TimeExtender.SetParentControlValue(System.String)">
+	<summary>   
+ Set Parent Control Value to Selected Time.
+ </summary>
+	<remarks>Add Parent control types here.</remarks>
+</member><member name="M:TimePicker.TimeExtender.FixPropertyConflicts">
+	<summary>   
+ Set Property defaults to fix conflicts.
+ </summary>
+	<remarks>Fixes conflicts in selected properties</remarks>
+</member><member name="M:TimePicker.TimeExtender.ValidateSelectedTime">
+	<summary>   
+ Set Selected Time.
+ </summary>
+	<remarks></remarks>
+</member><member name="M:TimePicker.TimeExtender.ShowOrHideTimePickerButton">
+	<summary>   
+ Show the Time Picker Button.
+ </summary>
+	<remarks>If enabled then only the button can bring up Time Picker.</remarks>
+</member><member name="M:TimePicker.TimeExtender.SetButtonsAMorPM(System.Web.UI.WebControls.LinkButton,System.String,System.String)">
+	<summary>   
+ Set AM PM Button ON or OFF.
+ </summary>
+	<remarks></remarks>
+</member><member name="M:TimePicker.TimeExtender.HideAMorPMButton(System.Web.UI.WebControls.LinkButton)">
+	<summary>   
+ Hide AM PM Button.
+ </summary>
+	<remarks></remarks>
+</member><member name="M:TimePicker.TimeExtender.SetLeadingZero(System.String)">
+	<summary>   
+ Add Leading Zero.
+ </summary>
+	<remarks></remarks>
+</member><member name="M:TimePicker.TimeExtender.GetParentControlWidth">
+	<summary>   
+ Returns Parent Control Width as Integer.
+ </summary>
+	<remarks></remarks>
+</member><member name="M:TimePicker.TimeExtender.GetTimePart(System.String)">
+	<summary>   
+ Returns only the Time without AM or PM suffix.
+ </summary>
+	<remarks></remarks>
+</member><member name="M:TimePicker.TimeExtender.SelectAMorPM(System.String)">
+	<summary>   
+ Returns AM or PM based on Selected Time value.
+ </summary>
+	<remarks></remarks>
+</member><member name="M:TimePicker.TimeExtender.SelectSelectedTimeAMorPM(System.String)">
+	<summary>   
+ Returns AM or PM for Selected button.
+ </summary>
+	<remarks></remarks>
+</member><member name="M:TimePicker.TimeExtender.Format12HourTime(System.String)">
+	<summary>   
+ Returns 12 Hour Clock time format.
+ </summary>
+	<remarks></remarks>
+</member><member name="M:TimePicker.TimeExtender.Format24HourTime(System.String)">
+	<summary>   
+ Returns 24 Hour Time Format.
+ </summary>
+	<remarks></remarks>
+</member><member name="P:TimePicker.TimeExtender.TargetControlID">
+	<summary>   
+ Sets Target Control ID.
+ </summary>
+	<remarks>Required</remarks>
+</member><member name="P:TimePicker.TimeExtender.SelectedTime">
+	<summary>   
+ Sets Selected Time or Returns Time to Calling control.
+ </summary>
+	<remarks></remarks>
+</member><member name="P:TimePicker.TimeExtender.MinuteIncrement">
+	<summary>   
+ Set Time Increment.
+ </summary>
+	<remarks></remarks>
+</member><member name="P:TimePicker.TimeExtender.ShowButton">
+	<summary>   
+ Show Time Picker Button.
+ </summary>
+	<remarks></remarks>
+</member><member name="P:TimePicker.TimeExtender.Show24HourClock">
+	<summary>   
+ Display time in 24 Hour Clock Format.
+ </summary>
+	<remarks></remarks>
+</member><member name="P:TimePicker.TimeExtender.Show24HourClockColon">
+	<summary>   
+ Display Colon with 24 Hour Clock.
+ </summary>
+	<remarks>Only Valid with 24 Hour Clock</remarks>
+</member><member name="P:TimePicker.TimeExtender.ShowAMandPM">
+	<summary>   
+ Display am and pm.
+ </summary>
+	<remarks>Only available when not showing 12 hour format</remarks>
+</member><member name="P:TimePicker.TimeExtender.ShowLeadingZeros">
+	<summary>   
+ Display Leading zeros for times.
+ </summary>
+	<remarks>Only available when showing 12 hour format</remarks>
+</member><member name="T:TimePicker.TimeExtender">
+	<summary>   
+ Show Time Picker.
+ </summary>
+	<remarks></remarks>
+</member><member name="F:TimePicker._Default.Head1">
+	<summary>
+Head1 control.
+</summary>
+	<remarks>
+Auto-generated field.
+To modify move field declaration from designer file to code-behind file.
+</remarks>
+</member><member name="F:TimePicker._Default.frmMain">
+	<summary>
+frmMain control.
+</summary>
+	<remarks>
+Auto-generated field.
+To modify move field declaration from designer file to code-behind file.
+</remarks>
+</member><member name="F:TimePicker._Default.ScriptManager1">
+	<summary>
+ScriptManager1 control.
+</summary>
+	<remarks>
+Auto-generated field.
+To modify move field declaration from designer file to code-behind file.
+</remarks>
+</member><member name="F:TimePicker._Default.UpdatePanel1">
+	<summary>
+UpdatePanel1 control.
+</summary>
+	<remarks>
+Auto-generated field.
+To modify move field declaration from designer file to code-behind file.
+</remarks>
+</member><member name="F:TimePicker._Default.lblStartTime">
+	<summary>
+lblStartTime control.
+</summary>
+	<remarks>
+Auto-generated field.
+To modify move field declaration from designer file to code-behind file.
+</remarks>
+</member><member name="F:TimePicker._Default.txtTime">
+	<summary>
+txtTime control.
+</summary>
+	<remarks>
+Auto-generated field.
+To modify move field declaration from designer file to code-behind file.
+</remarks>
+</member><member name="F:TimePicker._Default.TimePicker1">
+	<summary>
+TimePicker1 control.
+</summary>
+	<remarks>
+Auto-generated field.
+To modify move field declaration from designer file to code-behind file.
+</remarks>
+</member><member name="F:TimePicker._Default.lblEndTime">
+	<summary>
+lblEndTime control.
+</summary>
+	<remarks>
+Auto-generated field.
+To modify move field declaration from designer file to code-behind file.
+</remarks>
+</member><member name="F:TimePicker._Default.txtEndTime">
+	<summary>
+txtEndTime control.
+</summary>
+	<remarks>
+Auto-generated field.
+To modify move field declaration from designer file to code-behind file.
+</remarks>
+</member><member name="F:TimePicker._Default.timepickerEndTime">
+	<summary>
+timepickerEndTime control.
+</summary>
+	<remarks>
+Auto-generated field.
+To modify move field declaration from designer file to code-behind file.
+</remarks>
+</member>
+</members>
+</doc>

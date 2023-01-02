@@ -1,0 +1,60 @@
+﻿<%@ Page Language="C#" AutoEventWireup="true" CodeFile="Calling_System.aspx.cs" Inherits="Calling_System" %>
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head runat="server">
+    <title></title>
+    <script type="text/javascript" src="CallingSystem/jssip-0.3.0.min.js"></script>
+    <script type="text/javascript" src="CallingSystem/sipfunctions.js"></script>
+    <script type="text/javascript" src="CallingSystem/jquery-2.0.3.min.js"></script>
+    <script type="text/javascript">
+    var agentExtn  = 9001;
+      $(document).ready(function(e) {
+        phonestart();
+        $('.callStartBtn').click(function(){
+          console.log("call btn call");
+
+          var phoneNumber = $('#phoneNumber').val(),
+              agentId     = $('#agentId').val(),
+              agentName   = $('#agentName').val();
+
+          var form_data = {
+            agentExtn       : agentExtn,
+            agentId         : agentId,
+            agentName       : agentName,
+            customerNumber  : phoneNumber,
+            customerId      : '1',
+            campaignId      : '1',
+            campaignName    : 'DemoCampaign',
+            processId       : '1',
+            processName     : 'DeamoProcess',
+            leadsetId       : '2',
+            leadsetName     : 'DemoLeadset',
+          };
+          $.post('http://www.voitekk.in:4000/callingApis/click2CallExtn',form_data,function(data){
+            console.log(data);
+          }).error( function( data, status, xhr  ) {
+            console.log(data.responseText);
+          }).complete(function() { console.log("complete"); });
+        });
+
+        $('.callEndBtn').click(function(){
+          endcall();
+        });
+      });
+    </script>
+</head>
+<body>
+    <%--<form id="form1" runat="server">--%>
+    <div>
+        <video id="remoteView" autoplay="" poster="" src="" hidden="hidden"></video>
+        Phone Number    : <input type="text" id="phoneNumber"> 
+        Agent Name      : <input type="text" id="agentName"> 
+        Agent ID        : <input type="text" id="agentId"> 
+        <button class="callStartBtn" >CALL</button>
+        <button class="callEndBtn" >END</button>
+    </div>
+    <%--</form>--%>
+</body>
+</html>

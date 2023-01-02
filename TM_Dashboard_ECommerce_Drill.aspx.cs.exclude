@@ -1,0 +1,127 @@
+﻿using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.Data;
+using System.Diagnostics;
+using System.Data.SqlClient;
+using System.Configuration;
+using System.Web;
+using System.Web.Security;
+using System.Web.UI;
+using System.Web.UI.WebControls;
+using System.Web.UI.WebControls.WebParts;
+using System.Web.UI.HtmlControls;
+using System.IO;
+using ShoppingCart.BL;
+using System.Web.UI.DataVisualization.Charting;
+using System.Text;
+using InfoSoftGlobal;
+
+public partial class TM_Dashboard_ECommerce_Drill : System.Web.UI.Page
+{
+    protected void Page_Load(object sender, EventArgs e)
+    {
+        if (!IsPostBack)
+        {
+            if (Request.Cookies["MyCookiesLoginInfo"] != null)
+            {
+                HttpCookie cookie = Request.Cookies.Get("MyCookiesLoginInfo");
+                string UserID = cookie.Values["UserID"];
+                string UserName = cookie.Values["UserName"];
+                string year = Request.QueryString["year"];
+                //BindChartsforEcommercePortalData(year);
+                BindChartsforEcommercePortalData3D(year);
+                BindChartsforEcommercePortalData3D1(year);
+            }
+            else
+            {
+                Response.Redirect("login.aspx");
+            }
+
+        }
+    }
+
+    //private void BindChartsforEcommercePortalData(string Year)
+    //{
+    //    try
+    //    {
+    //        HttpCookie cookie = Request.Cookies.Get("MyCookiesLoginInfo");
+    //        string UserID = cookie.Values["UserID"];
+    //        string UserName = cookie.Values["UserName"];
+    //        DataSet ds = ProductController.GetDashboardValues_ETM(2, Year,"");
+    //        if (ds.Tables[0].Rows.Count > 0)
+    //        {
+    //            StringBuilder xmlStr = new StringBuilder();
+    //            xmlStr.Append("<chart caption='E-Commerce Monthwise Sales Analysis " + Year + "' showalternatehgridcolor='1' alternatehgridcolor='ff5904' divlinecolor='ff5904' divlinealpha='20' alternatehgridalpha='5' canvasbordercolor='666666' canvasborderthickness='1' basefontcolor='666666' linecolor='FF5904' linealpha='85' showvalues='1' rotatevalues='1' valueposition='auto' canvaspadding='8' bgcolor='ffffff' valuepadding='5' showborder='0' xaxisname='Month' yaxisname='Count'> [cceWl lang=’csharp’]");
+    //            DataTable dt = ds.Tables[0];
+    //            foreach (DataRow dr in dt.Rows)
+    //            {
+    //                xmlStr.AppendFormat("<set label='{0}' value='{1}' link='{2}'/>", dr["Month Name"].ToString(), dr["Sales Count"].ToString(), Server.UrlEncode("TM_Dashboard_ECommerce_Day_Drill.aspx?year=" + Year + "&Month=" + dr["Month Name"].ToString()));
+    //            }
+    //            xmlStr.Append("[/cceWl]</chart>");
+    //            FusionCharts.SetRenderer("javascript");
+    //            Literal5.Text = FusionCharts.RenderChart("FusionChartsXT/Line.swf", "", xmlStr.ToString(), "AdmissionCountYearwise", "100%", "", false, true);
+                
+    //        }
+    //    }
+    //    catch (Exception ex)
+    //    {
+    //    }
+    //}
+
+    private void BindChartsforEcommercePortalData3D(string Year)
+    {
+        try
+        {
+            HttpCookie cookie = Request.Cookies.Get("MyCookiesLoginInfo");
+            string UserID = cookie.Values["UserID"];
+            string UserName = cookie.Values["UserName"];
+            DataSet ds = ProductController.GetDashboardValues_ETM_3D(5, Year, "","");
+            string xmlstr = ds.Tables[0].Rows[0]["chart"].ToString();
+            FusionCharts.SetRenderer("javascript");
+            Literal1.Text = FusionCharts.RenderChart("FusionCharts/MSColumn3DLineDY.swf", "", xmlstr, "Division_Year_Sales_Analysis", "100%", "500", false, true);
+
+            DataSet ds1 = ProductController.GetDashboardValues_ETM_3D(6, Year, "", "");
+            string xmlstr1 = ds1.Tables[0].Rows[0]["chart"].ToString();
+            FusionCharts.SetRenderer("javascript");
+            Literal2.Text = FusionCharts.RenderChart("FusionCharts/MSColumn3DLineDY.swf", "", xmlstr1, "StateWise_Sales_Analysis", "100%", "500", false, true);
+
+
+            DataSet ds2 = ProductController.GetDashboardValues_ETM_3D(7, Year, "", "");
+            string xmlstr2 = ds2.Tables[0].Rows[0]["chart"].ToString();
+            FusionCharts.SetRenderer("javascript");
+            Literal3.Text = FusionCharts.RenderChart("FusionCharts/MSColumn3DLineDY.swf", "", xmlstr2, "StateWise_Sales_Analysis1", "100%", "500", false, true);
+
+        }
+        catch (Exception ex)
+        {
+        }
+
+    }
+
+    private void BindChartsforEcommercePortalData3D1(string Year)
+    {
+        try
+        {
+            HttpCookie cookie = Request.Cookies.Get("MyCookiesLoginInfo");
+            string UserID = cookie.Values["UserID"];
+            string UserName = cookie.Values["UserName"];
+            DataSet ds = ProductController.GetDashboardValues_ETM_3D1(1, Year, "", "");
+            string xmlstr = ds.Tables[0].Rows[0]["chart"].ToString();
+                //"<chart palette='1' caption='Sales' showlabels='1' showvalues='0' numberprefix='Rs.' syaxisvaluesdecimals='2' connectnulldata='0' pyaxisname='Revenue' syaxisname='Count' numdivlines='4' formatnumberscale='0' showborder='0'><categories><category label='January' link='newchart-xml-January1'/><category label='February' link='tm_Text.aspx?Year=2015&Month=2'/><category label='March' link='tm_Text.aspx?Year=2015&Month=3'/><category label='April' link='tm_Text.aspx?Year=2015&Month=4'/><category label='May' link='tm_Text.aspx?Year=2015&Month=5'/><category label='June' link='tm_Text.aspx?Year=2015&Month=6'/><category label='July' link='tm_Text.aspx?Year=2015&Month=7'/><category label='August' link='tm_Text.aspx?Year=2015&Month=8'/><category label='September' link='tm_Text.aspx?Year=2015&Month=9'/><category label='October' link='tm_Text.aspx?Year=2015&Month=10'/><category label='November' link='tm_Text.aspx?Year=2015&Month=11'/></categories><dataset seriesname='CA CPT' showvalues='0'><set value='5618' /><set value='31000' /><set value='92350' /><set value='64200' /><set value='15500' /><set value='0' /><set value='77500' /><set value='96350' /><set value='22000' /><set value='27500' /><set value='15500' /></dataset><dataset seriesname='CA Final' showvalues='0'><set value='1433322' /><set value='1128472' /><set value='989238' /><set value='831252' /><set value='1042280' /><set value='1722759' /><set value='1092621' /><set value='1499567' /><set value='1012878' /><set value='680450' /><set value='1558648' /></dataset><dataset seriesname='CA IPCC' showvalues='0'><set value='341400' /><set value='841270' /><set value='580450' /><set value='386720' /><set value='448900' /><set value='725480' /><set value='663523' /><set value='1021320' /><set value='424300' /><set value='194750' /><set value='492486' /></dataset><dataset seriesname='CBSE Class IX' showvalues='0'><set value='0' /><set value='0' /><set value='0' /><set value='0' /><set value='0' /><set value='29750' /><set value='45000' /><set value='66000' /><set value='0' /><set value='16500' /><set value='29588' /></dataset><dataset seriesname='CBSE Class IX & X' showvalues='0'><set value='0' /><set value='0' /><set value='0' /><set value='0' /><set value='0' /><set value='0' /><set value='0' /><set value='0' /><set value='0' /><set value='0' /><set value='19725' /></dataset><dataset seriesname='CBSE Class X' showvalues='0'><set value='3150' /><set value='32000' /><set value='53780' /><set value='110625' /><set value='93355' /><set value='21000' /><set value='45000' /><set value='163250' /><set value='45000' /><set value='45000' /><set value='0' /></dataset><dataset seriesname='COMM Class XI' showvalues='0'><set value='8160' /><set value='0' /><set value='27400' /><set value='18200' /><set value='18200' /><set value='63800' /><set value='243850' /><set value='186100' /><set value='51230' /><set value='35480' /><set value='21190' /></dataset><dataset seriesname='COMM CLASS XI + CLASS XII' showvalues='0'><set value='0' /><set value='0' /><set value='0' /><set value='0' /><set value='0' /><set value='0' /><set value='293400' /><set value='308920' /><set value='148960' /><set value='98360' /><set value='0' /></dataset><dataset seriesname='COMM Class XII' showvalues='0'><set value='3000' /><set value='0' /><set value='20700' /><set value='152850' /><set value='39280' /><set value='149400' /><set value='143800' /><set value='67700' /><set value='52900' /><set value='16560' /><set value='0' /></dataset><dataset seriesname='ICSE Class IX' showvalues='0'><set value='0' /><set value='0' /><set value='0' /><set value='0' /><set value='0' /><set value='30000' /><set value='60000' /><set value='30000' /><set value='28000' /><set value='18000' /><set value='0' /></dataset><dataset seriesname='ICSE CLASS IX + X' showvalues='0'><set value='0' /><set value='0' /><set value='0' /><set value='0' /><set value='0' /><set value='0' /><set value='0' /><set value='40000' /><set value='0' /><set value='0' /><set value='0' /></dataset><dataset seriesname='ICSE Class X' showvalues='0'><set value='0' /><set value='0' /><set value='0' /><set value='0' /><set value='31640' /><set value='25750' /><set value='23400' /><set value='0' /><set value='42500' /><set value='0' /><set value='0' /></dataset><dataset seriesname='Lakshya' showvalues='0'><set value='49500' /><set value='0' /><set value='52999' /><set value='52999' /><set value='209596' /><set value='200899' /><set value='514150' /><set value='0' /><set value='0' /><set value='471000' /><set value='0' /></dataset><dataset seriesname='MBA' showvalues='0'><set value='5999' /><set value='0' /><set value='33000' /><set value='0' /><set value='27000' /><set value='27000' /><set value='36000' /><set value='18000' /><set value='18000' /><set value='0' /><set value='33300' /></dataset><dataset seriesname='SCI CLASS XI' showvalues='0'><set value='0' /><set value='0' /><set value='22000' /><set value='0' /><set value='25500' /><set value='29000' /><set value='192420' /><set value='354900' /><set value='127350' /><set value='16000' /><set value='88575' /></dataset><dataset seriesname='SCI CLASS XI+XII' showvalues='0'><set value='60000' /><set value='0' /><set value='72000' /><set value='39000' /><set value='75000' /><set value='271000' /><set value='792450' /><set value='635500' /><set value='782450' /><set value='518440' /><set value='161500' /></dataset><dataset seriesname='SCI CLASS XII' showvalues='0'><set value='18000' /><set value='0' /><set value='168700' /><set value='244800' /><set value='329997' /><set value='306000' /><set value='459725' /><set value='192000' /><set value='204750' /><set value='156617' /><set value='134050' /></dataset><dataset seriesname='SSC CLASS IX' showvalues='0'><set value='15120' /><set value='19000' /><set value='38000' /><set value='127600' /><set value='103740' /><set value='327040' /><set value='238000' /><set value='131125' /><set value='126000' /><set value='67250' /><set value='5775' /></dataset><dataset seriesname='SSC CLASS IX & X' showvalues='0'><set value='0' /><set value='30000' /><set value='90000' /><set value='34020' /><set value='131040' /><set value='35000' /><set value='194000' /><set value='90550' /><set value='32500' /><set value='59500' /><set value='0' /></dataset><dataset seriesname='SSC CLASS V' showvalues='0'><set value='1134' /><set value='15000' /><set value='0' /><set value='0' /><set value='0' /><set value='0' /><set value='0' /><set value='0' /><set value='0' /><set value='0' /><set value='0' /></dataset><dataset seriesname='SSC CLASS VI ' showvalues='0'><set value='3591' /><set value='16000' /><set value='0' /><set value='0' /><set value='0' /><set value='48228' /><set value='97600' /><set value='70000' /><set value='41600' /><set value='13200' /><set value='0' /></dataset><dataset seriesname='SSC CLASS VII' showvalues='0'><set value='0' /><set value='0' /><set value='17000' /><set value='0' /><set value='0' /><set value='105000' /><set value='91858' /><set value='60000' /><set value='30000' /><set value='27500' /><set value='4200' /></dataset><dataset seriesname='SSC CLASS VIII' showvalues='0'><set value='7875' /><set value='8000' /><set value='0' /><set value='0' /><set value='21600' /><set value='264440' /><set value='92000' /><set value='72100' /><set value='47400' /><set value='30800' /><set value='13500' /></dataset><dataset seriesname='SSC CLASS X' showvalues='0'><set value='47250' /><set value='40000' /><set value='387900' /><set value='617428' /><set value='450640' /><set value='554880' /><set value='510000' /><set value='436525' /><set value='296350' /><set value='312500' /><set value='146150' /></dataset><dataset seriesname='SSC Marathi Class X' showvalues='0'><set value='0' /><set value='0' /><set value='0' /><set value='0' /><set value='0' /><set value='0' /><set value='15000' /><set value='0' /><set value='0' /><set value='12000' /><set value='0' /></dataset><dataset seriesname='SSC Semi ENG  Class X' showvalues='0'><set value='0' /><set value='0' /><set value='0' /><set value='0' /><set value='0' /><set value='0' /><set value='17500' /><set value='0' /><set value='0' /><set value='0' /><set value='0' /></dataset><dataset seriesname='SSC Semi ENG Class IX' showvalues='0'><set value='0' /><set value='0' /><set value='0' /><set value='0' /><set value='0' /><set value='0' /><set value='17500' /><set value='0' /><set value='0' /><set value='0' /><set value='0' /></dataset><dataset seriesname='Sales Count' color='8BBA00' showvalues='1' parentyaxis='S' renderas='Line'><set value='102' /><set value='70' /><set value='89' /><set value='96' /><set value='116' /><set value='188' /><set value='235' /><set value='204' /><set value='132' /><set value='97' /><set value='118' /></dataset><linkeddata id='January1'><chart caption='Monthly Revenue for  2014 Month:Jan' palette='3' showValues='0' numberPrefix='$' useRoundEdges='1'><set label='1' value='100'/><set label='2' value='10'/><set label='3' value='30'/><set label='4' value='50'/><set label='5' value='150'/></chart></linkeddata></chart>";
+                //
+            FusionCharts.SetRenderer("javascript");
+            Literal5.Text = FusionCharts.RenderChart("FusionCharts/MSColumn3DLineDY.swf", "", xmlstr, "Division_Year_Sales_Analysis1", "100%", "500", false, true);
+
+
+
+
+        }
+        catch (Exception ex)
+        {
+        }
+
+    }
+
+
+}

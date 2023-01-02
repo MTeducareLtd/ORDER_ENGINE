@@ -1,0 +1,85 @@
+﻿using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.Data;
+using System.Diagnostics;
+using System.Data.SqlClient;
+using System.Configuration;
+using System.Web;
+using System.Web.Security;
+using System.Web.UI;
+using System.Web.UI.WebControls;
+using System.Web.UI.WebControls.WebParts;
+using System.Web.UI.HtmlControls;
+using System.IO;
+using ShoppingCart.BL;
+
+public partial class Dashboard_Opportunity : System.Web.UI.Page
+{
+    protected void Page_Load(object sender, EventArgs e)
+    {
+        if (Request.Cookies["MyCookiesLoginInfo"] != null)
+        {
+            HttpCookie cookie = Request.Cookies.Get("MyCookiesLoginInfo");
+            string UserID = cookie.Values["UserID"];
+            string UserName = cookie.Values["UserName"];
+            divSuccessmessage.Visible = false;
+            divErrormessage.Visible = false;
+            divsearchresults.Visible = true;
+            divmessage.Visible = false;
+            divsearchresults.Visible = false;
+            //ScriptManager1.RegisterAsyncPostBackControl(Repeater1);
+            BindOppSummary();
+            //Bindlist();
+            BindAcademicYear();
+        }
+        else
+        {
+            Response.Redirect("login.aspx");
+        }
+
+    }
+
+    private void BindOppSummary()
+    {
+        HttpCookie cookie = Request.Cookies.Get("MyCookiesLoginInfo");
+        string UserID = cookie.Values["UserID"];
+        string UserName = cookie.Values["UserName"];
+        string oppcompany = "All";
+        string AcadYear = Request["AcadYear"];
+        DataSet ds = ProductController.Getleadoppsummary(2, UserID, oppcompany);
+        if (ds.Tables[0].Rows.Count > 0)
+        {
+            dloppsummary.DataSource = ds;
+            dloppsummary.DataBind();
+        }
+        else
+        {
+            dloppsummary.Visible = false;
+        }
+    }
+
+    private void BindAcademicYear()
+    {
+        DataSet ds = ProductController.GetAllAcadyear();
+        //DataSet ds = ProductController.GetAcademicYearbyCenter(ddlcenter.SelectedValue);
+        BindDDL(ddlAcadYear, ds, "Acad_Year", "Acad_Year");
+        string AcadYear = Request["AcadYear"];
+        ddlAcadYear.SelectedValue = AcadYear;
+        //ddlAcadYear.Items.Insert(0, "Select");
+        //ddlAcadYear.SelectedIndex = 1;
+    }
+
+    private void BindDDL(DropDownList ddl, DataSet ds, string txtField, string valField)
+    {
+        ddl.DataSource = ds;
+        ddl.DataTextField = txtField;
+        ddl.DataValueField = valField;
+        ddl.DataBind();
+    }
+
+    protected void ddlAcadYear_SelectedIndexChanged(object sender, EventArgs e)
+    {
+
+    }
+}

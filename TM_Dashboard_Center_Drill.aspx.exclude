@@ -1,0 +1,107 @@
+﻿<%@ Page Title="" Language="C#" MasterPageFile="~/Main.master" AutoEventWireup="true" CodeFile="TM_Dashboard_Center_Drill.aspx.cs" Inherits="TM_Dashboard_Center_Drill" %>
+
+<asp:Content ID="Content1" ContentPlaceHolderID="head" Runat="Server">
+    <script src="fusioncharts-n-xt-developer/js/fusioncharts.js" type="text/javascript"></script>
+    <script src="fusioncharts-n-xt-developer/js/fusioncharts.charts.js" type="text/javascript"></script>
+    <script src="fusioncharts-n-xt-developer/js/fusioncharts.widgets.js" type="text/javascript"></script>
+    <script src="fusioncharts-n-xt-developer/js/fusioncharts.powercharts.js" type="text/javascript"></script>
+</asp:Content>
+<asp:Content ID="Content2" ContentPlaceHolderID="MainContainer" Runat="Server">
+    <div id="page-content" class="clearfix">
+        <div class="page-header position-relative">
+            <h1>
+                Top Management Dashboard <small><i class="icon-double-angle-right"></i> <b>Academic Year: <asp:Label ID="lblacadyear" runat="server"></asp:Label>|| Division Name: <asp:Label ID="lblDivisionname" runat="server"></asp:Label> || Zone Name: <asp:Label ID="lblZonename" runat="server"></asp:Label></b></small>
+            </h1>
+        </div>
+        <div class="row-fluid">
+            <div class="space-6">
+            </div>
+            <div class="row-fluid">
+                <div class="span12">
+                    <div class="widget-box">
+                        <div class="widget-header widget-header-flat widget-header-small">
+                            <h5>
+                                <i class="icon-bar-chart"></i>Zone-Center Wise Admission Analysis</h5>
+                        </div>
+                        <div class="widget-body">
+                            <div class="widget-main">
+                                <asp:Literal ID="Literal0" runat="server">        
+                                </asp:Literal>
+                            </div>
+                            <!--/widget-main-->
+                        </div>
+                    </div>
+                    <!--/widget-box-->
+                </div>
+                <!--/span-->
+            </div>
+           <%--  <div class="hr hr32 hr-dotted">
+            </div>
+            <div class="row-fluid">
+                <div class="span12">
+                    <div class="widget-box">
+                        <div class="widget-header widget-header-flat widget-header-small">
+                            <h5>
+                                <i class="icon-bar-chart"></i>Zone-Center Wise Confirm Admission</h5>
+                        </div>
+                        <div class="widget-body">
+                            <div class="widget-main">
+                                <asp:Literal ID="Literal2" runat="server">        
+                                </asp:Literal>
+                            </div>
+                            <!--/widget-main-->
+                        </div>
+                    </div>
+                    <!--/widget-box-->
+                </div>
+                
+            </div>
+             <div class="hr hr32 hr-dotted">
+            </div>
+            <div class="row-fluid">
+                <div class="span12">
+                    <div class="widget-box">
+                        <div class="widget-header widget-header-flat widget-header-small">
+                            <h5>
+                                <i class="icon-bar-chart"></i>Zone-Center Wise Pending Admission</h5>
+                        </div>
+                        <div class="widget-body">
+                            <div class="widget-main">
+                                <asp:Literal ID="Literal1" runat="server">        
+                                </asp:Literal>
+                            </div>
+                            <!--/widget-main-->
+                        </div>
+                    </div>
+                    <!--/widget-box-->
+                </div>
+            </div>
+             <div class="hr hr32 hr-dotted">
+            </div>
+            <div class="row-fluid">
+                <div class="span12">
+                    <div class="widget-box">
+                        <div class="widget-header widget-header-flat widget-header-small">
+                            <h5>
+                                <i class="icon-bar-chart"></i>Zone-Center Wise Pending Admissions Due to Events</h5>
+                        </div>
+                        <div class="widget-body">
+                            <div class="widget-main">
+                                <asp:Literal ID="Literal3" runat="server">        
+                                </asp:Literal>
+                            </div>
+                            <!--/widget-main-->
+                        </div>
+                    </div>
+                    <!--/widget-box-->
+                </div>
+            
+            </div>
+            <!--/row-->
+            <div class="hr hr32 hr-dotted">
+            </div>--%>
+            
+        </div>
+    </div>
+</asp:Content>
+

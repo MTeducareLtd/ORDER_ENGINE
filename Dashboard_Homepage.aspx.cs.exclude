@@ -1,0 +1,341 @@
+﻿using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.Data;
+using System.Diagnostics;
+using System.Data.SqlClient;
+using System.Configuration;
+using System.Web;
+using System.Web.Security;
+using System.Web.UI;
+using System.Web.UI.WebControls;
+using System.Web.UI.WebControls.WebParts;
+using System.Web.UI.HtmlControls;
+using System.IO;
+using ShoppingCart.BL;
+using System.Web.UI.DataVisualization.Charting;
+using System.Text;
+using InfoSoftGlobal;
+
+public partial class Dashboard_Homepage : System.Web.UI.Page
+{
+    protected void Page_Load(object sender, EventArgs e)
+    {
+        if (!IsPostBack)
+        {
+            if (Request.Cookies["MyCookiesLoginInfo"] != null)
+            {
+                HttpCookie cookie = Request.Cookies.Get("MyCookiesLoginInfo");
+                string UserID = cookie.Values["UserID"];
+                string UserName = cookie.Values["UserName"];
+                BindAcademicYear();
+                
+                //BindCharts();
+                try
+                {
+                    DataSet ds = ProductController.GetDashboardValuesbyAcadYear(UserID, ddlAcadYear.SelectedValue);
+                    //if (ds.Tables[0].Rows.Count > 0)
+                    //{
+                        StringBuilder xmlStr = new StringBuilder();
+                        StringBuilder xmlStr1 = new StringBuilder();
+                        StringBuilder xmlStr2 = new StringBuilder();
+
+                        xmlStr.Append("<chart caption='Lead' subcaption='Status Wise Analysis' palette='5' canvasbgalpha='0' placevaluesinside='1' bgcolor='#DDDDDD' bgalpha='50' showalternatehgridcolor='1' showvalues='1' bgimage='' bgimagealpha='40' bgimagedisplaymode='stretch' theme='fint' showborder='1' bordercolor='#666666' numberPrefix='' useRoundEdges='1' xaxisname='Lead Status' yaxisname='Count'> [cceWl lang=’csharp’]");
+                        xmlStr1.Append("<chart bgcolor='CCCCCC,FFFFFF' caption='' palette='5' basefontcolor='333333' showvalues='1' placevaluesinside='1' decimals='0' numbersuffix='' pyramidyscale='40' chartbottommargin='0' captionpadding='0' showborder='1' bordercolor='#666666' theme='fint'>[cceWl lang=’csharp’]");
+                        xmlStr2.Append("<chart caption='Sales' subcaption='Stage Analysis' palette='5' decimals='0' bgcolor='#DDDDDD' basefontsize='11' issliced='1' placevaluesinside='1' showborder='1' bordercolor='#666666' theme='fint'> [cceWl lang=’csharp’]");
+
+                        DataTable dt = ds.Tables[0];
+                        DataTable dt1 = ds.Tables[1];
+                        DataTable dt2 = ds.Tables[2];
+
+                        if (ds.Tables[0].Rows.Count > 0)
+                        {
+                            foreach (DataRow dr in dt.Rows)
+                            {
+                                xmlStr.AppendFormat("<set label='{0}' value='{1}' />", dr["Lead_status_desc"].ToString(), dr["Lead_Count"].ToString(), Server.UrlEncode("DrillDown.aspx?year=" + dr["Lead_status_desc"].ToString()));
+                                //For Adding Link Below
+                                //xmlStr.AppendFormat("<set label='{0}' value='{1}' link='{2}'/>", dr["Lead_status_desc"].ToString(), dr["Lead_Count"].ToString(), Server.UrlEncode("DrillDown.aspx?year=" + dr["Lead_status_desc"].ToString()));
+
+                            }
+                            xmlStr.Append("[/cceWl]</chart>");
+                        }
+                        if (ds.Tables[1].Rows.Count > 0)
+                        {
+                            foreach (DataRow dr1 in dt1.Rows)
+                            {
+                                xmlStr1.AppendFormat("<set label='{0}' value='{1}'  issliced='1'/>", dr1["Sales_Stage_Desc"].ToString(), dr1["Oppur_Count"].ToString(), Server.UrlEncode("DrillDown1.aspx?year=" + dr1["Sales_Stage_Desc"].ToString()));
+                            }
+                            xmlStr1.Append("[/cceWl]</chart>");
+                        }
+                        if (ds.Tables[2].Rows.Count > 0)
+                        {
+                            foreach (DataRow dr2 in dt2.Rows)
+                            {
+                                xmlStr2.AppendFormat("<set label='{0}' value='{1}' issliced='1'/>", dr2["Sales_Stage_Desc"].ToString(), dr2["Value"].ToString(), Server.UrlEncode("DrillDown1.aspx?year=" + dr2["Sales_Stage_Desc"].ToString()));
+                            }
+                            xmlStr2.Append("[/cceWl]</chart>");
+                        }
+                        // Set the rendering mode to JavaScript, from the default Flash.
+                        if ((ds.Tables[0].Rows.Count > 0) || (ds.Tables[1].Rows.Count > 0) || (ds.Tables[2].Rows.Count > 0))
+                        {
+                            FusionCharts.SetRenderer("javascript");
+                            if (ds.Tables[0].Rows.Count > 0)
+                            {
+                                ltleadStatus.Text = FusionCharts.RenderChart("FusionChartsXT/Column3D.swf", "", xmlStr.ToString(), "Lead_Status", "100%", "", false, true);
+                            }
+                            if (ds.Tables[1].Rows.Count > 0)
+                            {
+                                ltsalesstage.Text = FusionCharts.RenderChart("FusionChartsXT/Pyramid.swf", "", xmlStr1.ToString(), "Sales_Status", "100%", "", false, true);
+                            }
+                            if (ds.Tables[2].Rows.Count > 0)
+                            {
+                                ltsalespipeline.Text = FusionCharts.RenderChart("FusionChartsXT/Pie3D.swf", "", xmlStr2.ToString(), "Sales_Pipeline", "100%", "", false, true);
+                            }
+                        }
+
+                        if (ds.Tables[3].Rows.Count > 0)
+                        {
+                            lblleadcount.Text = Convert.ToString(ds.Tables[3].Rows[0]["Leadcount"]);
+                        }
+                        if (ds.Tables[4].Rows.Count > 0)
+                        {
+                            lblopportunitycount.Text = Convert.ToString(ds.Tables[4].Rows[0]["OpporCount"]);
+                        }
+                        if (ds.Tables[5].Rows.Count > 0)
+                        {
+                            lblAccountCount.Text = Convert.ToString(ds.Tables[5].Rows[0]["AccountCount"]);
+                        }
+                        if (ds.Tables[6].Rows.Count > 0)
+                        {
+                            lblpendingaccount.Text = Convert.ToString(ds.Tables[6].Rows[0]["AccountCountPending"]);
+                            lblpendingacc.Text = Convert.ToString(ds.Tables[6].Rows[0]["AccountCountPending"]);
+                        }
+                        if (ds.Tables[7].Rows.Count > 0)
+                        {
+                            lblconfirmaccount.Text = Convert.ToString(ds.Tables[7].Rows[0]["AccountCountConfirm"]);
+                        }
+                        if (ds.Tables[8].Rows.Count > 0)
+                        {
+                            lblpendingfollowup.Text = Convert.ToString(ds.Tables[8].Rows[0]["PendingFollowupCount"]);
+                        }
+                        if (ds.Tables[9].Rows.Count > 0)
+                        {
+                            lbldiscountvalue.Text = Convert.ToString(ds.Tables[9].Rows[0]["DiscountValue"]);
+                        }
+                        if (ds.Tables[10].Rows.Count > 0)
+                        {
+                            lblApprovalPendingCount.Text = Convert.ToString(ds.Tables[10].Rows[0]["ApprovalPendingCount"]);
+                        }
+                        //lblApprovalPendingCount1.Text = Convert.ToString(ds.Tables[10].Rows[0]["ApprovalPendingCount"]);
+                        int Count1 = Convert.ToInt32(int.Parse(lblopportunitycount.Text).ToString());
+                        int AccountCount1 = Convert.ToInt32(int.Parse(lblAccountCount.Text).ToString());
+                        float Conversion = (AccountCount1 * 100) / (Count1 + AccountCount1);
+                        lblconversion.Text = string.Format("{0}", Conversion) + " %";
+                        //divleadcount.Attributes.Add("data-percent", "80");
+                        //lblconversion.Attributes.Add("ToolTip", "(Account x 100/Opportunity+Account)");
+                        divconfirmadmission.Attributes.Add("data-percent", "80");
+                        divapprovalpending.Attributes.Add("data-percent", "75");
+                        //divconfirmadmission.Attributes.Add("data-size", "80");
+
+
+                        //HtmlAnchor NavigatePendingadmission = apendingadmission;
+                        //HtmlAnchor NavigateAdmission = aadmission;
+                        //NavigatePendingadmission.HRef = "Dashboard_Account.aspx?&AcadYear=" + ddlAcadYear.SelectedValue;
+                        //NavigateAdmission.HRef = "Dashboard_Account.aspx?&AcadYear=" + ddlAcadYear.SelectedValue;
+                    //}
+
+                }
+                catch (Exception ex)
+                {
+
+                }
+            }
+            else
+            {
+                Response.Redirect("login.aspx");
+            }
+        }
+    }
+    int Sum;
+
+    //public static void ShowMessage(System.Web.UI.Page Pointer, string Message)
+    //{
+    //    if (!Pointer.ClientScript.IsStartupScriptRegistered("message"))
+    //        ScriptManager.RegisterStartupScript(Pointer,
+    //                                            Pointer.Master.GetType(),
+    //                                            "message",
+    //                                            "ShowMessage('" + Message + "');",
+    //                                            true);
+    //}
+
+    private void BindDDL(DropDownList ddl, DataSet ds, string txtField, string valField)
+    {
+        ddl.DataSource = ds;
+        ddl.DataTextField = txtField;
+        ddl.DataValueField = valField;
+        ddl.DataBind();
+    }
+
+    private void BindAcademicYear()
+    {
+        DataSet ds = ProductController.GetAllAcadyear();
+        //DataSet ds = ProductController.GetAcademicYearbyCenter(ddlcenter.SelectedValue);
+        BindDDL(ddlAcadYear, ds, "Acad_Year", "Acad_Year");
+        //ddlAcadYear.Items.Insert(0, "Select");
+        ddlAcadYear.SelectedValue = "2016-2017";
+        HtmlAnchor NavigatePendingadmission = apendingadmission;
+        HtmlAnchor NavigateAdmission = aadmission;
+        HtmlAnchor NavigateOpportunity = Dashboard_Opportunity;
+        NavigatePendingadmission.HRef = "Dashboard_Account.aspx?&AcadYear=" + ddlAcadYear.SelectedValue;
+        NavigateAdmission.HRef = "Dashboard_Account.aspx?&AcadYear=" + ddlAcadYear.SelectedValue;
+        NavigateOpportunity.HRef = "Dashboard_Opportunity.aspx?&AcadYear=" + ddlAcadYear.SelectedValue;
+    }
+
+
+    protected void ddlAcadYear_SelectedIndexChanged(object sender, EventArgs e)
+    {
+        if (Request.Cookies["MyCookiesLoginInfo"] != null)
+        {
+            HttpCookie cookie = Request.Cookies.Get("MyCookiesLoginInfo");
+            string UserID = cookie.Values["UserID"];
+            string UserName = cookie.Values["UserName"];
+            try
+            {
+                DataSet ds = ProductController.GetDashboardValuesbyAcadYear(UserID, ddlAcadYear.SelectedValue);
+                //if (ds.Tables[0].Rows.Count > 0)
+                //{
+                    StringBuilder xmlStr = new StringBuilder();
+                    StringBuilder xmlStr1 = new StringBuilder();
+                    StringBuilder xmlStr2 = new StringBuilder();
+
+                    xmlStr.Append("<chart caption='Lead' subcaption='Status Wise Analysis' palette='3' canvasbgalpha='0' bgcolor='#DDDDDD' bgalpha='50' showalternatehgridcolor='1' showvalues='1' bgimage='' bgimagealpha='40' bgimagedisplaymode='stretch' theme='fint' showborder='1' bordercolor='#666666' numberPrefix='' useRoundEdges='1' xaxisname='Lead Status' yaxisname='Count'> [cceWl lang=’csharp’]");
+                    //xmlStr1.Append("<chart caption='Sales Stage' subcaption='' palette='3' canvasbgalpha='0' bgcolor='#DDDDDD' bgalpha='50' showalternatehgridcolor='1' bgimage='' bgimagealpha='40' bgimagedisplaymode='stretch' theme='fint' showValues='0' showborder='1' bordercolor='#666666' numberPrefix='' useRoundEdges='1' xaxisname='Stage' yaxisname='Count'> [cceWl lang=’csharp’]");
+                    xmlStr1.Append("<chart bgcolor='CCCCCC,FFFFFF' caption='Sales Stage' basefontcolor='333333' showvalues='1' decimals='0' numbersuffix='' pyramidyscale='40' chartbottommargin='0' captionpadding='0' showborder='0'>[cceWl lang=’csharp’]");
+                    //xmlStr2.Append("<chart bgcolor='CCCCCC,FFFFFF' caption='Sales Stage' basefontcolor='333333' showvalues='1' decimals='0' numbersuffix='' pyramidyscale='40' chartbottommargin='0' captionpadding='0' showborder='0'>[cceWl lang=’csharp’]");
+                    //xmlStr2.Append("chart caption='Sales' yaxismaxvalue='100' bgcolor='406181, 6DA5DB' bgalpha='100' basefontcolor='FFFFFF' canvasbgalpha='0' canvasbordercolor='FFFFFF' divlinecolor='FFFFFF' divlinealpha='100' numvdivlines='10' vdivlineisdashed='1' showalternatevgridcolor='1' linecolor='BBDA00' anchorradius='4' anchorbgcolor='BBDA00' anchorbordercolor='FFFFFF' anchorborderthickness='2' showvalues='0' numbersuffix='%' tooltipbgcolor='406181' tooltipbordercolor='406181' alternatehgridalpha='5' labeldisplay='ROTATE' canvaspadding='10' showborder='0'>[cceWl lang=’csharp’]");
+                    //xmlStr2.Append("<chart caption='Age profile of website visitors' subcaption='Last Year' startingangle='120' showlabels='0' showlegend='1' enablemultislicing='0' slicingdistance='15' showpercentvalues='1' showpercentintooltip='0' plottooltext='Age group : $label<br>Total visit : $datavalue'> [cceWl lang=’csharp’]");
+                    //xmlStr2.Append("<chart caption='Sales' subcaption='Pipeline' palette='3' canvasbgalpha='0' bgcolor='CCCCCC,FFFFFF' bgalpha='100' showalternatehgridcolor='1' showvalues='1' bgimage='' bgimagealpha='40' bgimagedisplaymode='stretch' showborder='1' bordercolor='#666666' numberPrefix='' useRoundEdges='1' xaxisname='Sales Stage' yaxisname='Count'> [cceWl lang=’csharp’]");
+                    xmlStr2.Append("<chart caption='Sales' subcaption='Pipeline' decimals='1' basefontsize='11' issliced='1' showborder='0'> [cceWl lang=’csharp’]");
+
+                    DataTable dt = ds.Tables[0];
+                    DataTable dt1 = ds.Tables[1];
+                    DataTable dt2 = ds.Tables[2];
+
+                    if (ds.Tables[0].Rows.Count > 0)
+                    {
+                        foreach (DataRow dr in dt.Rows)
+                        {
+                            xmlStr.AppendFormat("<set label='{0}' value='{1}' />", dr["Lead_status_desc"].ToString(), dr["Lead_Count"].ToString(), Server.UrlEncode("DrillDown.aspx?year=" + dr["Lead_status_desc"].ToString()));
+                            //For Adding Link Below
+                            //xmlStr.AppendFormat("<set label='{0}' value='{1}' link='{2}'/>", dr["Lead_status_desc"].ToString(), dr["Lead_Count"].ToString(), Server.UrlEncode("DrillDown.aspx?year=" + dr["Lead_status_desc"].ToString()));
+
+                        }
+                        xmlStr.Append("[/cceWl]</chart>");
+                    }
+                    if (ds.Tables[1].Rows.Count > 0)
+                    {
+                        foreach (DataRow dr1 in dt1.Rows)
+                        {
+                            xmlStr1.AppendFormat("<set label='{0}' value='{1}'  issliced='1'/>", dr1["Sales_Stage_Desc"].ToString(), dr1["Oppur_Count"].ToString(), Server.UrlEncode("DrillDown1.aspx?year=" + dr1["Sales_Stage_Desc"].ToString()));
+                        }
+                        xmlStr1.Append("[/cceWl]</chart>");
+                    }
+                    if (ds.Tables[2].Rows.Count > 0)
+                    {
+                        foreach (DataRow dr2 in dt2.Rows)
+                        {
+                            xmlStr2.AppendFormat("<set label='{0}' value='{1}' issliced='1'/>", dr2["Sales_Stage_Desc"].ToString(), dr2["Value"].ToString(), Server.UrlEncode("DrillDown1.aspx?year=" + dr2["Sales_Stage_Desc"].ToString()));
+                        }
+                        xmlStr2.Append("[/cceWl]</chart>");
+                    }
+                    // Set the rendering mode to JavaScript, from the default Flash.
+                    if ((ds.Tables[0].Rows.Count > 0) || (ds.Tables[1].Rows.Count > 0) || (ds.Tables[2].Rows.Count > 0))
+                    {
+                        FusionCharts.SetRenderer("javascript");
+                        if (ds.Tables[0].Rows.Count > 0)
+                        {
+                            ltleadStatus.Text = FusionCharts.RenderChart("FusionChartsXT/Column3D.swf", "", xmlStr.ToString(), "Lead_Status", "100%", "", false, true);
+                        }
+                        if (ds.Tables[1].Rows.Count > 0)
+                        {
+                            ltsalesstage.Text = FusionCharts.RenderChart("FusionChartsXT/Pyramid.swf", "", xmlStr1.ToString(), "Sales_Status", "100%", "", false, true);
+                        }
+                        if (ds.Tables[2].Rows.Count > 0)
+                        {
+                            ltsalespipeline.Text = FusionCharts.RenderChart("FusionChartsXT/Pie3D.swf", "", xmlStr2.ToString(), "Sales_Pipeline", "100%", "", false, true);
+                        }
+                    }
+
+                    if (ds.Tables[3].Rows.Count > 0)
+                    {
+                        lblleadcount.Text = Convert.ToString(ds.Tables[3].Rows[0]["Leadcount"]);
+                    }
+                    if (ds.Tables[4].Rows.Count > 0)
+                    {
+                        lblopportunitycount.Text = Convert.ToString(ds.Tables[4].Rows[0]["OpporCount"]);
+                    }
+                    if (ds.Tables[5].Rows.Count > 0)
+                    {
+                        lblAccountCount.Text = Convert.ToString(ds.Tables[5].Rows[0]["AccountCount"]);
+                    }
+                    if (ds.Tables[6].Rows.Count > 0)
+                    {
+                        lblpendingaccount.Text = Convert.ToString(ds.Tables[6].Rows[0]["AccountCountPending"]);
+                        lblpendingacc.Text = Convert.ToString(ds.Tables[6].Rows[0]["AccountCountPending"]);
+                    }
+                    if (ds.Tables[7].Rows.Count > 0)
+                    {
+                        lblconfirmaccount.Text = Convert.ToString(ds.Tables[7].Rows[0]["AccountCountConfirm"]);
+                    }
+                    if (ds.Tables[8].Rows.Count > 0)
+                    {
+                        lblpendingfollowup.Text = Convert.ToString(ds.Tables[8].Rows[0]["PendingFollowupCount"]);
+                    }
+                    if (ds.Tables[9].Rows.Count > 0)
+                    {
+                        lbldiscountvalue.Text = Convert.ToString(ds.Tables[9].Rows[0]["DiscountValue"]);
+                    }
+                    if (ds.Tables[10].Rows.Count > 0)
+                    {
+                        lblApprovalPendingCount.Text = Convert.ToString(ds.Tables[10].Rows[0]["ApprovalPendingCount"]);
+                        //lblApprovalPendingCount1.Text = Convert.ToString(ds.Tables[10].Rows[0]["ApprovalPendingCount"]);
+                    }
+                    int Count1 = Convert.ToInt32(int.Parse(lblopportunitycount.Text).ToString());
+                    int AccountCount1 = Convert.ToInt32(int.Parse(lblAccountCount.Text).ToString());
+                    if (AccountCount1 > 0)
+                    {
+                        float Conversion = (AccountCount1 * 100) / (Count1 + AccountCount1);
+                        lblconversion.Text = string.Format("{0}", Conversion) + " %";
+                    }
+                    else
+                    {
+                        lblconversion.Text = string.Format("{0}", "0") + " %";
+                    }
+                    //divleadcount.Attributes.Add("data-percent", "80");
+                    lblconversion.Attributes.Add("ToolTip", "(Account x 100/Opportunity+Account)");
+                    HtmlAnchor NavigatePendingadmission = apendingadmission;
+                    HtmlAnchor NavigateAdmission = aadmission;
+                    NavigatePendingadmission.HRef = "Dashboard_Account.aspx?&AcadYear=" + ddlAcadYear.SelectedValue;
+                    NavigateAdmission.HRef = "Dashboard_Account.aspx?&AcadYear=" + ddlAcadYear.SelectedValue;
+                    HtmlAnchor NavigateOpportunity = Dashboard_Opportunity;
+
+                    NavigateOpportunity.HRef = "Dashboard_Opportunity.aspx?&AcadYear=" + ddlAcadYear.SelectedValue;
+
+
+                //}
+
+            }
+            catch (Exception ex)
+            {
+
+            }
+        }
+        else
+        {
+            Response.Redirect("login.aspx");
+        }
+    }
+
+    
+
+}

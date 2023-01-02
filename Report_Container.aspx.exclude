@@ -1,0 +1,84 @@
+﻿<%@ Page Title="" Language="C#" MasterPageFile="~/Reports.master" AutoEventWireup="true" CodeFile="Report_Container.aspx.cs" Inherits="Report_Container" %>
+
+<asp:Content ID="Content1" ContentPlaceHolderID="head" Runat="Server">
+</asp:Content>
+<asp:Content ID="Content2" ContentPlaceHolderID="ContentPlaceHolder1" Runat="Server">
+<asp:ScriptManager ID="ScriptManager1" runat="server">
+    </asp:ScriptManager>
+    <div id="breadcrumbs" class="position-relative" style="height: 53px">
+        <ul class="breadcrumb" style="height: 15px">
+            <li><i class="icon-home"></i><a href="Report_Dashboard.aspx">Home</a><span class="divider"><i
+                class="icon-angle-right"></i></span></li>
+            <li>Report<span class="divider"> <i class="icon-angle-right"></i></span></li>
+            <li>
+                <h4 class="blue">
+                    Fees Summary<span class="divider"></span></h4>
+            </li>
+        </ul>
+        <div id="nav-search">
+            <!-- /btn-group -->
+            <asp:Button class="btn  btn-app btn-primary btn-mini radius-4  " Visible="false"
+                runat="server" ID="BtnShowSearchPanel" Text="Search" />
+        </div>
+        <!--#nav-search-->
+    </div>
+    <div id="page-content" class="clearfix">
+        <!--/page-header-->
+        <div class="row-fluid">
+            <!-- -->
+            <!-- PAGE CONTENT BEGINS HERE -->
+            <asp:UpdatePanel ID="UpdatePanelMsgBox" runat="server" UpdateMode="Conditional">
+                <ContentTemplate>
+                    <div class="alert alert-block alert-success" id="Msg_Success" visible="false" runat="server">
+                        <button type="button" class="close" data-dismiss="alert">
+                            <i class="icon-remove"></i>
+                        </button>
+                        <p>
+                            <strong><i class="icon-ok"></i></strong>
+                            <asp:Label ID="lblSuccess" runat="server" Text="Label"></asp:Label>
+                        </p>
+                    </div>
+                    <div class="alert alert-error" id="Msg_Error" visible="false" runat="server">
+                        <button type="button" class="close" data-dismiss="alert">
+                            <i class="icon-remove"></i>
+                        </button>
+                        <p>
+                            <strong><i class="icon-remove"></i>Error!</strong>
+                            <asp:Label ID="lblerror" runat="server" Text="Label"></asp:Label>
+                        </p>
+                    </div>
+                </ContentTemplate>
+            </asp:UpdatePanel>
+              <div id="DivSearchPanel" runat="server">
+                <div class="widget-box">
+                    <div class="widget-header widget-header-small header-color-dark">
+                        <h5>
+                            Report
+                        </h5>
+                    </div>
+                    <div class="widget-body">
+                        <div class="widget-body-inner">
+                            <div class="widget-main">
+                                
+                                <div id="DivRoot" align="left"> 
+                                    <div style="overflow: hidden;" id="DivHeaderRow"></div>  
+                                        <div style="overflow:scroll;" onscroll="OnScrollDiv(this)" id="DivMainContent">                                                       
+                                                                        
+                                            <asp:GridView ID="dlGridReport" ShowFooter ="false"  runat="server" AutoGenerateColumns="False" Style="white-space :nowrap;"  CssClass="mGrid" OnDataBound = "OnDataBound" >
+                                            </asp:GridView>
+                                                                        
+                                        </div>
+                                    <div id="DivFooterRow" style="overflow:hidden"></div>
+                                </div>
+
+                            </div>
+                            
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+        </div>
+    </div>
+</asp:Content>
+

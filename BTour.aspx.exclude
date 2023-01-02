@@ -1,0 +1,63 @@
+﻿<%@ Page Title="" Language="C#" MasterPageFile="~/Main.master" AutoEventWireup="true" CodeFile="BTour.aspx.cs" Inherits="BTour" %>
+
+<asp:Content ID="Content1" ContentPlaceHolderID="head" Runat="Server">
+
+    <script src="assets/charisma.js" type="text/javascript"></script>
+</asp:Content>
+<asp:Content ID="Content2" ContentPlaceHolderID="MainContainer" Runat="Server">
+<div id="breadcrumbs" class="position-relative" style="height: 53px">
+        <ul class="breadcrumb" style="height: 15px">
+            <li><i class="icon-home"></i><a href="Homepage.aspx">Home</a><span class="divider"><i
+                class="icon-angle-right"></i></span></li>
+            <li>
+                <h4 class="blue">
+                    <asp:Label ID="lblpagetitle1" runat="server"></asp:Label>&nbsp;<b><asp:Label ID="lblstudentname"
+                        runat="server" ForeColor="DarkRed"></asp:Label></b><small> &nbsp;
+                            <asp:Label ID="lblpagetitle2" runat="server"></asp:Label></small>
+                    <asp:Label ID="lblusercompany" runat="server" Visible="false"></asp:Label>
+                    <span class="divider"></span>
+                </h4>
+            </li>
+            <li id="limidbreadcrumb" runat="server" visible="false"><a href="Contacts.aspx">
+                <asp:Label ID="lblmidbreadcrumb" runat="server"></asp:Label></a></li>
+            <li id="lilastbreadcrumb" runat="server" visible="false"><i class="fa fa-angle-right">
+            </i><a href="#">
+                <asp:Label ID="lbllastbreadcrumb" runat="server"></asp:Label></a></li>
+        </ul>
+        <div id="nav-search">
+            
+        </div>
+        <!--#nav-search-->
+    </div>
+    <div id="page-content" class="clearfix">
+        <div class="page-content">
+            <div class="row-fluid">
+                        <div class="span12" >
+                            <div id="Div2" class="row-fluid">
+                                <div class="row-fluid">
+                                    <div class="span12">
+                                        <div class="table-responsive">
+                                            <div class="row-fluid">
+                                                <div class="span12">
+                                                    <div class="widget-box" id="content">
+                                                        <div class="widget-header"  id="content">
+                                                            <h5>
+                                                                Contact
+                                                            </h5>
+                                                        </div>
+                                                        
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+        </div>
+    </div>
+    
+</asp:Content>
+

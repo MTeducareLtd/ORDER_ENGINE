@@ -1,0 +1,70 @@
+﻿using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.Data;
+using System.Diagnostics;
+using System.Data.SqlClient;
+using System.Configuration;
+using System.Web;
+using System.Web.Security;
+using System.Web.UI;
+using System.Web.UI.WebControls;
+using System.Web.UI.WebControls.WebParts;
+using System.Web.UI.HtmlControls;
+using System.IO;
+using ShoppingCart.BL;
+partial class UserControl_UC_Header : System.Web.UI.UserControl
+{
+
+    protected void Page_Load(object sender, System.EventArgs e)
+    {
+        if (!IsPostBack)
+        {
+            string UserID = "";
+            string UserName = null;
+            HttpCookie cookie = Request.Cookies.Get("MyCookiesLoginInfo");
+            if (Request.Cookies["MyCookiesLoginInfo"] != null)
+            {
+                //BindNotification()
+                UserID = cookie.Values["UserID"];
+                UserName = cookie.Values["UserName"];
+                lblusername.Text = UserName.ToString();
+                //Dim Userid As String = cookie.Values("UserID")
+                string UserCompany = "";
+                SqlDataReader dr1 = UserController.GetCompanyby_Userid(UserID);
+                try
+                {
+                    if ((((dr1) != null)))
+                    {
+                        if (dr1.Read())
+                        {
+                            UserCompany = dr1["Company_Code"].ToString();
+                            lblcompanyname.Text = dr1["Company_Name"].ToString();
+                        }
+                    }
+
+                }
+                catch (Exception ex)
+                {
+                }
+                lblusercompany.Text = UserCompany;
+                //If lblusercompany.Text = "MPUC" Then
+                //    lblcompanyname.Text = "Mahesh PU College"
+                //Else
+                //    lblcompanyname.Text = "MTEducare Ltd."
+                //End If
+            }
+            else
+            {
+                Response.Redirect("login.aspx");
+
+            }
+        }
+    }
+    public UserControl_UC_Header()
+    {
+        Load += Page_Load;
+    }
+
+
+}

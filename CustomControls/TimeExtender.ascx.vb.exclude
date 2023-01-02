@@ -1,0 +1,653 @@
+﻿Imports System
+Imports System.Web.UI
+Imports System.Web.UI.WebControls
+Imports System.ComponentModel
+Imports System.Drawing
+
+''' <summary>   
+''' Show Time Picker.
+''' </summary>
+''' <remarks></remarks>
+<Category("TimeExtender")> _
+<Description("Show Time Picker")>
+<Browsable(True)> _
+<ToolboxBitmap(GetType(TimeExtender), "TimeExtender.bmp")> _
+<ToolboxData("<{0}:TimePicker ID='TimePicker' runat=""server""> </{0}:TimePicker>")> _
+Partial Public Class TimeExtender
+    Inherits System.Web.UI.UserControl
+
+
+#Region " Init / Page Load "
+
+    Protected Sub Page_Init(ByVal sender As Object, ByVal e As System.EventArgs) Handles Me.Init
+        'set property defaults based on selected properties to fix conflicts
+        Call FixPropertyConflicts()
+        'validate selected date
+        Call ValidateSelectedTime()
+        'load times
+        Call BindDataSource()
+        'show or hide the picker button that appears beside parent control
+        Call ShowOrHideTimePickerButton()
+    End Sub
+
+    Protected Sub Page_Load(ByVal sender As Object, ByVal e As System.EventArgs) Handles Me.Load
+        'databind must be in init routine or links will not return proper time
+        '  when switching from am to pm and back several times
+    End Sub
+
+#End Region
+
+#Region " Public Functions "
+
+    ''' <summary>   
+    ''' Resolves Style Sheet URL.
+    ''' </summary>
+    ''' <remarks>Allows parent page to find sytle sheet</remarks>
+    <Category("TimeExtender")> _
+    <Description("Points parent page to proper CSS URL Subfolder")> _
+    Public Function ResolveControlURL(ByVal strURL As String) As String
+        Dim lnk As New HtmlGenericControl("link")
+        Return lnk.ResolveUrl(strURL).ToString
+    End Function
+
+#End Region
+
+#Region " Populate DataSource with Times "
+
+    ''' <summary>   
+    ''' Populate Dateset with Times
+    ''' </summary>
+    ''' <remarks>Handles 12 Hour Clock or 24 Hour clock</remarks>
+    Private Function CreateDataSource() As ICollection
+        ' Create time data for the DataList control.
+        Dim dt As DataTable = New DataTable()
+        Dim dr As DataRow
+        ' Define the columns of the table.
+        dt.Columns.Add(New DataColumn("Time", GetType(String)))
+        ' Populate the table with sample values.
+        Dim intMinuteIncrement As Integer = Convert.ToInt32(ViewState("MinuteIncrement"))
+        If intMinuteIncrement = 0 Then intMinuteIncrement = 30
+        '24 hour clock or 12 hour clock
+        Dim intMaxTime As Integer = 720 - intMinuteIncrement
+        Dim strAMorPM As String = " " & SelectAMorPM()
+        'show am and pm
+        If CBool(ViewState("ShowAMandPM")) Then
+            intMaxTime = 1440 - 1 'don't show last time
+            strAMorPM = " am"
+        End If
+        'show 24 hour clock
+        Dim strColon As String = ":"
+        Dim strHoursFormat As String = "{0:#0}"
+        If CBool(ViewState("Show24HourClock")) Then
+            intMaxTime = 1440 - 1 'don't show last time
+            strAMorPM = ""
+            strHoursFormat = "{0:00}"
+            If Not CBool(ViewState("Show24HourClockColon")) Then
+                strColon = ""
+            End If
+        Else
+            If CBool(ViewState("ShowLeadingZeros")) Then
+                strHoursFormat = "{0:00}"
+            End If
+        End If
+        'populate times
+        Dim intHours As Integer = 0
+        Dim intMins As Integer = 0
+        For intTime As Integer = 0 To intMaxTime Step intMinuteIncrement
+            If intTime = 0 Or intTime Mod 60 = 0 Then
+                'reset mins
+                intMins = 0
+                'add hours
+                If CBool(ViewState("Show24HourClock")) Then
+                    '24 hour clock
+                    intHours = intTime / 60
+                Else
+                    '12 hour clock
+                    intHours = intTime / 60
+                    If CBool(ViewState("ShowAMandPM")) And intHours > 11 Then
+                        strAMorPM = " pm"
+                        If intHours > 12 Then intHours = intHours - 12
+                    End If
+                    If intHours = 0 Then intHours = 12
+                End If
+                'add row
+                Dim timeHours As String = String.Format(strHoursFormat & strColon & "{1:00}", intHours, 0) & strAMorPM
+                dr = dt.NewRow()
+                dr(0) = timeHours
+                dt.Rows.Add(dr)
+            Else
+                'add minutes
+                intMins += intMinuteIncrement
+                Dim timeMinutes As String = String.Format(strHoursFormat & strColon & "{1:00}", intHours, intMins) & strAMorPM
+                dr = dt.NewRow()
+                dr(0) = timeMinutes
+                dt.Rows.Add(dr)
+            End If
+        Next
+        'return dataview
+        Dim dv As DataView = New DataView(dt)
+        Return dv
+    End Function
+
+#End Region
+
+#Region " DataList Routines "
+
+    ''' <summary>   
+    ''' DataList OnItemDataBound sets picker buttons.
+    ''' </summary>
+    ''' <remarks>Sets header and detail link buttons in Datalist</remarks>
+    <Category("TimeExtender")> _
+    <Description("Datalist link button setup")> _
+    Protected Sub datalistTimes_OnItemDataBound(ByVal sender As Object, e As DataListItemEventArgs)
+        'header
+        If e.Item.ItemType = ListItemType.Header Then
+            Dim objlblTime As LinkButton = CType(e.Item.FindControl("lbtnHeaderTime"), LinkButton)
+            If objlblTime IsNot Nothing Then
+                Dim strCurrTime As String = Date.Now.ToShortTimeString
+                If CBool(ViewState("Show24HourClock")) Then
+                    strCurrTime = Format24HourTime(strCurrTime)
+                End If
+                objlblTime.Text = SetLeadingZero(strCurrTime)
+                objlblTime.BorderWidth = 0 'could not get working in CSS so do it here
+            End If
+            'set AM button
+            Dim objlbtnHeader As LinkButton = CType(e.Item.FindControl("lbtnHeaderAM"), LinkButton)
+            If objlbtnHeader IsNot Nothing Then
+                If CBool(ViewState("Show24HourClock")) Then
+                    Call HideAMorPMButton(objlbtnHeader)
+                Else
+                    'show both buttons and select one
+                    Call SetButtonsAMorPM(objlbtnHeader, "am")
+                End If
+            End If
+            'set PM buton
+            objlbtnHeader = CType(e.Item.FindControl("lbtnHeaderPM"), LinkButton)
+            If objlbtnHeader IsNot Nothing Then
+                If CBool(ViewState("Show24HourClock")) Then
+                    'hide buttons if displaying 24 hour clock
+                    Call HideAMorPMButton(objlbtnHeader)
+                Else
+                    'show both buttons and select one
+                    Call SetButtonsAMorPM(objlbtnHeader, "pm")
+                End If
+            End If
+        End If
+        'can set selected time here - not used
+        'need routine to check which time is closest to interval time
+        If e.Item.ItemType = ListItemType.Item Or e.Item.ItemType = ListItemType.AlternatingItem Then
+            Dim objlbtnItem As LinkButton = CType(e.Item.FindControl("lbtnTime"), LinkButton)
+            If objlbtnItem IsNot Nothing Then
+                If Format24HourTime(objlbtnItem.Text) = Format24HourTime(CStr(ViewState("SelectedTime"))) Then
+                    'e.Item.CssClass = "Datalist_ItemStyle_CodeBehind"
+                    'objlbtnItem.Text = CStr(ViewState("SelectedTime"))
+                Else
+                    'e.Item.CssClass = "Datalist_ItemStyle"
+                End If
+            End If
+        End If
+    End Sub
+
+    ''' <summary>   
+    ''' DataList bind.
+    ''' </summary>
+    ''' <remarks></remarks>
+    <Category("TimeExtender")> _
+    <Description("Bind to Datalist")> _
+    Private Sub BindDataSource()
+        Me.datalistTimes.DataSource = CreateDataSource()
+        Me.datalistTimes.DataBind()
+    End Sub
+
+#End Region
+
+#Region " Datalist Button Events "
+
+    ''' <summary>   
+    ''' Return time to parent control after Time clicked.
+    ''' </summary>
+    ''' <remarks></remarks>
+    <Category("TimeExtender")> _
+    <Description("Return click on time to parent control")> _
+    Protected Sub lbtnTime_Onclick(ByVal sender As Object, e As CommandEventArgs)
+        Dim strSelectedValue As String = e.CommandArgument.ToString.ToUpper
+        Call CommitTime(strSelectedValue)
+    End Sub
+
+    ''' <summary>   
+    ''' Time Button Event.
+    ''' </summary>
+    ''' <remarks></remarks>
+    <Category("TimeExtender")> _
+    <Description("Action when current time button is clicked")> _
+    Protected Sub lbtnHeaderTime_OnCommand(ByVal sender As Object, ByVal e As CommandEventArgs)
+        'set to current time
+        Dim strCurrTime As String = Date.Now.ToShortTimeString
+        If CBool(ViewState("Show24HourClock")) Then
+            strCurrTime = Format24HourTime(strCurrTime)
+        End If
+        'hide the popup and return the time
+        Call CommitTime(strCurrTime)
+    End Sub
+
+    ''' <summary>   
+    ''' AM Button Event.
+    ''' </summary>
+    ''' <remarks></remarks>
+    <Category("TimeExtender")> _
+    <Description("Action when AM button is clicked")> _
+    Protected Sub lbtnHeaderAM_OnCommand(ByVal sender As Object, ByVal e As CommandEventArgs)
+        ViewState("SelectedTimeAMorPM") = "am"
+        Call SetButtonsAMorPM(sender, "am")
+        'must set Selected time to am to refresh datasource
+        ViewState("SelectedTime") = GetTimePart() & " am"
+        Call BindDataSource()
+    End Sub
+
+    ''' <summary>   
+    ''' PM Button Event.
+    ''' </summary>
+    ''' <remarks></remarks>
+    <Category("TimeExtender")> _
+    <Description("Action when PM button is clicked")> _
+    Protected Sub lbtnHeaderPM_OnCommand(ByVal sender As Object, ByVal e As CommandEventArgs)
+        ViewState("SelectedTimeAMorPM") = "pm"
+        Call SetButtonsAMorPM(sender, "pm")
+        'must set Selected time to pm to refresh datasoure
+        ViewState("SelectedTime") = GetTimePart() & " pm"
+        Call BindDataSource()
+    End Sub
+
+#End Region
+
+#Region " Parent Control Routines "
+
+    ''' <summary>   
+    ''' Return time to parent control after Time clicked.
+    ''' </summary>
+    ''' <remarks>Must find the parent on main page if using button</remarks>
+    <Category("TimeExtender")> _
+    <Description("Return clicked on time to parent control")> _
+    Private Sub CommitTime(ByVal strSelectedTime As String)
+        If CBool(ViewState("ShowButton")) Then
+            Call SetParentControlValue(strSelectedTime)
+        End If
+        Me.PopupControlExtender_Time.Commit(strSelectedTime)
+    End Sub
+
+    ''' <summary>   
+    ''' Set Parent Control Value to Selected Time.
+    ''' </summary>
+    ''' <remarks>Add Parent control types here.</remarks>
+    <Category("TimeExtender")> _
+    <Description("Sets Parent control value by control type.")> _
+    Private Sub SetParentControlValue(ByVal strSelectedValue As String)
+        'get parent control
+        Dim strTargetControlID As String = CStr(ViewState("TargetControlID"))
+        Dim objParentControl As Control = CType(Me.Parent.FindControl(strTargetControlID), Control)
+        'get type of control
+        Dim strType As String = objParentControl.GetType.ToString
+        Select Case True
+            Case strType.ToLower.Contains("textbox")
+                Dim textboxParent As TextBox = CType(objParentControl, TextBox)
+                textboxParent.Text = strSelectedValue
+            Case strType.Contains("label")
+                Dim lblParent As Label = CType(objParentControl, Label)
+                lblParent.Text = strSelectedValue
+        End Select
+    End Sub
+#End Region
+
+#Region " Private Subs "
+
+    ''' <summary>   
+    ''' Set Property defaults to fix conflicts.
+    ''' </summary>
+    ''' <remarks>Fixes conflicts in selected properties</remarks>
+    <Category("TimeExtender")> _
+    <Description("Action when AM button is clicked")> _
+    Private Sub FixPropertyConflicts()
+        'set defaults
+        If ViewState("ShowButton") Is Nothing Then ViewState("ShowButton") = "false"
+        If ViewState("SelectedTime") Is Nothing Then ViewState("SelectedTime") = ""
+        If ViewState("Show24HourClock") Is Nothing Then ViewState("Show24HourClock") = "false"
+        If ViewState("ShowLeadingZeros") Is Nothing Then ViewState("ShowLeadingZeros") = "false"
+        If ViewState("MinuteIncrement") Is Nothing Then ViewState("MinuteIncrement") = "30"
+        If ViewState("Show24HourClockColon") Is Nothing Then ViewState("Show24HourClockColon") = "false"
+        'fix 24 hour clock conflicts
+        If CBool(ViewState("Show24HourClock")) Then
+            ViewState("ShowAMandPM") = "false"
+            ViewState("ShowLeadingZeros") = "true"
+        End If
+        'fix 12 hour clock conflicts and set defaults
+        If Not CBool(ViewState("Show24HourClock")) Then
+            ViewState("Show24HourClockColon") = "false"
+            If ViewState("ShowAMandPM") Is Nothing Then ViewState("ShowAMandPM") = "true"
+        End If
+        'Increment must be 5,10,15...
+        Dim intIncrement As Integer = CInt(ViewState("MinuteIncrement"))
+        If intIncrement > 60 Then ViewState("MinuteIncrement") = "60"
+        If intIncrement < 5 Then ViewState("MinuteIncrement") = "30"
+        If intIncrement Mod 5 > 0 Then
+            ViewState("MinuteIncrement") = "30"
+        End If
+    End Sub
+
+    ''' <summary>   
+    ''' Set Selected Time.
+    ''' </summary>
+    ''' <remarks></remarks>
+    <Category("TimeExtender")> _
+    <Description("Set Selected Time.")> _
+    Private Sub ValidateSelectedTime()
+        Dim strSelectedTime As String = CStr(ViewState("SelectedTime"))
+        'first validate the time entered - set to empty string if not valid
+        If Not IsDate(strSelectedTime) Then
+            ViewState("SelectedTime") = ""
+        End If
+        Exit Sub
+        'Format time
+        If CBool(ViewState("Show24HourClock")) Then
+            ViewState("SelectedTime") = Format24HourTime(strSelectedTime)
+        Else
+            ViewState("SelectedTime") = Format12HourTime(strSelectedTime)
+            ViewState("SelectedTimeAMorPM") = SelectAMorPM(strSelectedTime)
+        End If
+    End Sub
+
+    ''' <summary>   
+    ''' Show the Time Picker Button.
+    ''' </summary>
+    ''' <remarks>If enabled then only the button can bring up Time Picker.</remarks>
+    <Category("TimeExtender")> _
+    <Description("Set the Time Picker Button that appears beside parent control.")> _
+    Private Sub ShowOrHideTimePickerButton()
+        Dim bolShowButton As Boolean = CBool(ViewState("ShowButton"))
+        If bolShowButton Then
+            Me.ibtnShowPicker.Visible = True
+            Me.PopupControlExtender_Time.TargetControlID = Me.ibtnShowPicker.UniqueID
+            'set popup position
+            Me.PopupControlExtender_Time.OffsetX = (7 + GetParentControlWidth()) * (-1)
+        Else
+            Me.ibtnShowPicker.Visible = False
+            'must set new target control
+            Me.PopupControlExtender_Time.TargetControlID = CStr(ViewState("TargetControlID"))
+        End If
+    End Sub
+
+    ''' <summary>   
+    ''' Set AM PM Button ON or OFF.
+    ''' </summary>
+    ''' <remarks></remarks>
+    <Category("TimeExtender")> _
+    <Description("Set AM PM button ON or OFF")> _
+    Private Sub SetButtonsAMorPM(ByVal objlbtnHeader As LinkButton, ByVal strAMorPM As String, Optional strTime As String = "")
+        If CBool(ViewState("ShowAMandPM")) Then
+            'hide button if displaying am and pm
+            objlbtnHeader.BorderWidth = 0
+            objlbtnHeader.Visible = False
+        Else
+            'show both buttons and select one
+            If SelectAMorPM(strTime) = strAMorPM Then
+                objlbtnHeader.BorderWidth = 1
+            Else
+                objlbtnHeader.BorderWidth = 0
+            End If
+        End If
+    End Sub
+
+    ''' <summary>   
+    ''' Hide AM PM Button.
+    ''' </summary>
+    ''' <remarks></remarks>
+    <Category("TimeExtender")> _
+    <Description("Hide AM PM button")> _
+    Private Sub HideAMorPMButton(ByVal objlbtnHeader As LinkButton)
+        objlbtnHeader.Visible = False
+    End Sub
+
+#End Region
+
+#Region " Private Functions "
+
+    ''' <summary>   
+    ''' Add Leading Zero.
+    ''' </summary>
+    ''' <remarks></remarks>
+    <Category("TimeExtender")> _
+    <Description("Add leadning zero to time")> _
+    Private Function SetLeadingZero(ByVal strTime As String) As String
+        If CBool(ViewState("Show24HourClock")) Then Return strTime
+        If Not CBool(ViewState("ShowLeadingZeros")) Then
+            If strTime.Substring(0, 1) = "0" Then
+                Return " " & strTime.Substring(1)
+            End If
+        End If
+        Return strTime
+    End Function
+
+    ''' <summary>   
+    ''' Returns Parent Control Width as Integer.
+    ''' </summary>
+    ''' <remarks></remarks>
+    <Category("TimeExtender")> _
+    <Description("Get Parent Control Width as Integer")> _
+    Private Function GetParentControlWidth() As Integer
+        Dim strTargetControlID As String = CStr(ViewState("TargetControlID"))
+        Dim objParentControl As Control = CType(Me.Parent.FindControl(strTargetControlID), Control)
+        If objParentControl Is Nothing Then Return 50
+        Dim strControlType As String = objParentControl.GetType.ToString
+        Select Case True
+            Case strControlType.ToLower.Contains("textbox")
+                Dim textboxParent As TextBox = CType(objParentControl, TextBox)
+                Return CInt(textboxParent.Width.Value)
+            Case strControlType.Contains("label")
+                Dim lblParent As Label = CType(objParentControl, Label)
+                Return CInt(lblParent.Width.Value)
+        End Select
+        Return 50
+    End Function
+
+    ''' <summary>   
+    ''' Returns only the Time without AM or PM suffix.
+    ''' </summary>
+    ''' <remarks></remarks>
+    <Category("TimeExtender")> _
+    <Description("Returns only the numeric time part.")> _
+    Private Function GetTimePart(Optional ByVal strTime As String = "") As String
+        Dim strSelectedTime As String = CStr(ViewState("SelectedTime")).ToLower
+        If strTime > "" Then strSelectedTime = strTime.ToLower
+        strSelectedTime = strSelectedTime.Replace("am", "").Trim
+        strSelectedTime = strSelectedTime.Replace("pm", "").Trim
+        Dim intLength As Integer = 5
+        If CBool(ViewState("Show24HourClock")) And Not CBool(ViewState("Show24HourClockColon")) Then
+            'no colon
+            strSelectedTime = strSelectedTime.Replace(":", "")
+            intLength = 4
+        End If
+        'pad with leading zeros
+        If strSelectedTime.Length < intLength Then
+            strSelectedTime = "0" & strSelectedTime
+        End If
+        Return strSelectedTime
+    End Function
+
+    ''' <summary>   
+    ''' Returns AM or PM based on Selected Time value.
+    ''' </summary>
+    ''' <remarks></remarks>
+    <Category("TimeExtender")> _
+    <Description("Returns only the AM or PM part of the time.")> _
+    Private Function SelectAMorPM(Optional ByVal strTime As String = "") As String
+        Dim strSelectedTime As String = CStr(ViewState("SelectedTime"))
+        If strTime > "" Then strSelectedTime = strTime.ToLower
+        If strSelectedTime.ToLower.Contains("am") Then
+            Return "am"
+        Else
+            Return "pm"
+        End If
+    End Function
+
+    ''' <summary>   
+    ''' Returns AM or PM for Selected button.
+    ''' </summary>
+    ''' <remarks></remarks>
+    <Category("TimeExtender")> _
+    <Description("Set AM PM button")> _
+    Private Function SelectSelectedTimeAMorPM(ByVal strTime As String) As String
+        If CBool(ViewState("ShowAMandPM")) Then
+            Dim strAMorPM As String = CStr(ViewState("SelectedTimeAMorPM"))
+            strTime = strTime.Replace("am", strAMorPM)
+            strTime = strTime.Replace("pm", strAMorPM)
+        End If
+        Return strTime
+    End Function
+
+    ''' <summary>   
+    ''' Returns 12 Hour Clock time format.
+    ''' </summary>
+    ''' <remarks></remarks>
+    <Category("TimeExtender")> _
+    <Description("Returns time in 12 hour clock format.")> _
+    Private Function Format12HourTime(ByVal strTime As String) As String
+        strTime = String.Format("{00:00}", strTime)
+        strTime = Regex.Replace(strTime, "[^1234567890]", "")
+        If strTime.Length < 4 Then strTime = "0" & strTime
+        Dim DT As DateTime = DateTime.ParseExact(strTime, "HHmm", _
+            Globalization.CultureInfo.InvariantCulture)
+        Return DT.ToString("hh:mm tt")
+    End Function
+
+    ''' <summary>   
+    ''' Returns 24 Hour Time Format.
+    ''' </summary>
+    ''' <remarks></remarks>
+    <Category("TimeExtender")> _
+    <Description("Returns time in 24 hour format.")> _
+    Private Function Format24HourTime(ByVal strTime As String) As String
+        Dim strTimeOnly As String = GetTimePart(strTime)
+        If strTime.ToLower.Contains("pm") Then
+            'convert to 24 hour clock
+            Dim intHours As Integer = CInt(strTimeOnly.Substring(0, 2))
+            intHours += 12
+            strTimeOnly = CStr(intHours).PadLeft(2, "0") & strTimeOnly.Substring(2)
+        End If
+        Return strTimeOnly
+    End Function
+
+#End Region
+
+#Region " Public Properties "
+
+    ''' <summary>   
+    ''' Sets Target Control ID.
+    ''' </summary>
+    ''' <remarks>Required</remarks>
+    <Category("TimeExtender")> _
+    <Description("Set Target Control ID")> _
+    <DefaultValue("Parent Control")> _
+    Public WriteOnly Property TargetControlID() As String
+        Set(value As String)
+            ViewState("TargetControlID") = value
+        End Set
+    End Property
+
+    ''' <summary>   
+    ''' Sets Selected Time or Returns Time to Calling control.
+    ''' </summary>
+    ''' <remarks></remarks>
+    <Category("TimeExtender")> _
+    <Description("Show Time Picker Button")> _
+    <DefaultValue("current time")> _
+    Public Property SelectedTime() As String
+        Get
+            Return CStr(ViewState("SelectedTime"))
+        End Get
+        Set(value As String)
+            ViewState("SelectedTime") = value
+        End Set
+    End Property
+
+    ''' <summary>   
+    ''' Set Time Increment.
+    ''' </summary>
+    ''' <remarks></remarks>
+    <Category("TimeExtender")> _
+    <Description("Show Time Picker Button")> _
+    <DefaultValue(30)> _
+    Public WriteOnly Property MinuteIncrement() As Integer
+        Set(value As Integer)
+            ViewState("MinuteIncrement") = value
+        End Set
+    End Property
+
+    ''' <summary>   
+    ''' Show Time Picker Button.
+    ''' </summary>
+    ''' <remarks></remarks>
+    <Category("TimeExtender")> _
+    <Description("Show Time Picker Button")> _
+    <DefaultValue(False)> _
+    Public WriteOnly Property ShowButton() As Boolean
+        Set(ByVal value As Boolean)
+            ViewState("ShowButton") = value
+        End Set
+    End Property
+
+    ''' <summary>   
+    ''' Display time in 24 Hour Clock Format.
+    ''' </summary>
+    ''' <remarks></remarks>
+    <Category("TimeExtender")> _
+    <Description("Show 24 Hour Clock")> _
+    <DefaultValue(False)> _
+    Public WriteOnly Property Show24HourClock() As Boolean
+        Set(ByVal value As Boolean)
+            ViewState("Show24HourClock") = value
+        End Set
+    End Property
+
+    ''' <summary>   
+    ''' Display Colon with 24 Hour Clock.
+    ''' </summary>
+    ''' <remarks>Only Valid with 24 Hour Clock</remarks>
+    <Category("TimeExtender")> _
+    <Description("Show 24 Hour Clock Colon")> _
+    <DefaultValue(True)> _
+    Public WriteOnly Property Show24HourClockColon() As Boolean
+        Set(ByVal value As Boolean)
+            ViewState("Show24HourClockColon") = value
+        End Set
+    End Property
+
+    ''' <summary>   
+    ''' Display am and pm.
+    ''' </summary>
+    ''' <remarks>Only available when not showing 12 hour format</remarks>
+    <Category("TimeExtender")> _
+    <Description("Show AM and PM for 12 Hour Clock")> _
+    <DefaultValue(False)> _
+    Public WriteOnly Property ShowAMandPM() As Boolean
+        Set(ByVal value As Boolean)
+            ViewState("ShowAMandPM") = value
+        End Set
+    End Property
+
+    ''' <summary>   
+    ''' Display Leading zeros for times.
+    ''' </summary>
+    ''' <remarks>Only available when showing 12 hour format</remarks>
+    <Category("TimeExtender")> _
+    <Description("Show Leading Zeros for 12 Hour Clock")> _
+    <DefaultValue(False)> _
+    Public WriteOnly Property ShowLeadingZeros() As Boolean
+        Set(ByVal value As Boolean)
+            ViewState("ShowLeadingZeros") = value
+        End Set
+    End Property
+
+#End Region
+
+End Class
+
+

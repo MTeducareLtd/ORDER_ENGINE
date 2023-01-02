@@ -1,0 +1,118 @@
+﻿using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.Data;
+using System.Diagnostics;
+using System.Data.SqlClient;
+using System.Configuration;
+using System.Web;
+using System.Web.Security;
+using System.Web.UI;
+using System.Web.UI.WebControls;
+using System.Web.UI.WebControls.WebParts;
+using System.Web.UI.HtmlControls;
+using System.IO;
+using ShoppingCart.BL;
+using System.Web.UI.DataVisualization.Charting;
+using System.Text;
+using InfoSoftGlobal;
+
+public partial class TM_Dashboard_Center_Drill : System.Web.UI.Page
+{
+    protected void Page_Load(object sender, EventArgs e)
+    {
+        if (!IsPostBack)
+        {
+            if (Request.Cookies["MyCookiesLoginInfo"] != null)
+            {
+                HttpCookie cookie = Request.Cookies.Get("MyCookiesLoginInfo");
+                string UserID = cookie.Values["UserID"];
+                string UserName = cookie.Values["UserName"];
+                string year = Request.QueryString["Acadyear"];
+                string DivisionCode = Request.QueryString["DivisionCode"];
+                string DivisionName = Request.QueryString["Division"];
+                string ZoneCode = Request.QueryString["ZoneCode"];
+                string ZoneName = Request.QueryString["Zone"];
+                lblacadyear.Text = year;
+                lblDivisionname.Text = DivisionName;
+                lblZonename.Text = ZoneName;
+                BindChartsWithoutCategories(year, DivisionCode, DivisionName,ZoneCode,ZoneName);
+            }
+            else
+            {
+                Response.Redirect("login.aspx");
+            }
+
+        }
+
+    }
+
+    private void BindChartsWithoutCategories(string year, string DivisionCode, string DivisionName,string ZoneCode, string ZoneName)
+    {
+        try
+        {
+            HttpCookie cookie = Request.Cookies.Get("MyCookiesLoginInfo");
+            string UserID = cookie.Values["UserID"];
+            string UserName = cookie.Values["UserName"];
+
+            //string year = Request.QueryString["Acadyear"];
+
+            DataSet ds = ProductController.GetDashboardValues_TM_DivisionWise(3, year, DivisionCode, ZoneCode,"");
+            if (ds.Tables[0].Rows.Count > 0)
+            {
+                string xmlstr = ds.Tables[0].Rows[0]["chart"].ToString();
+                FusionCharts.SetRenderer("javascript");
+                Literal0.Text = FusionCharts.RenderChart("FusionCharts/StackedColumn3DLine.swf", "", xmlstr, "Acad_Year_Admission", "100%", "500", false, true);
+
+                //StringBuilder xmlStr = new StringBuilder();
+                //StringBuilder xmlStr1 = new StringBuilder();
+                //StringBuilder xmlStr2 = new StringBuilder();
+                //StringBuilder xmlStr3 = new StringBuilder();
+
+                //xmlStr.Append("<chart caption='Zone-Center Wise Count' subcaption='Academic Year:" + year + " & Division: " + DivisionName + " & Zone: " + ZoneName + "' palette='3' labelDisplay='Auto' drawAnchors='1' canvasbgalpha='0' bgcolor='#DDDDDD' bgalpha='50' showalternatehgridcolor='1' showvalues='1' bgimage='' bgimagealpha='40' bgimagedisplaymode='stretch' theme='fint' showborder='1' bordercolor='#666666' numberPrefix='' useRoundEdges='1' xaxisname='Center' yaxisname='Admission Count'> [cceWl lang=’csharp’]");
+                //xmlStr1.Append("<chart caption='Zone Wise Confirm Admission' subcaption='Academic Year:" + year + " & Division: " + DivisionName + " & Zone: " + ZoneName + "' palette='3' canvasbgalpha='0' bgcolor='#DDDDDD' bgalpha='50' showalternatehgridcolor='1' showvalues='1' bgimage='' bgimagealpha='40' bgimagedisplaymode='stretch' theme='fint' showborder='1' bordercolor='#666666' numberPrefix='' useRoundEdges='1' xaxisname='Division' yaxisname='Admission Count'> [cceWl lang=’csharp’]");
+                //xmlStr2.Append("<chart caption='Zone Wise Pending Admission' subcaption='Academic Year:" + year + " & Division: " + DivisionName + " & Zone: " + ZoneName + "' palette='3' canvasbgalpha='0' bgcolor='#DDDDDD' bgalpha='50' showalternatehgridcolor='1' showvalues='1' bgimage='' bgimagealpha='40' bgimagedisplaymode='stretch' theme='fint' showborder='1' bordercolor='#666666' numberPrefix='' useRoundEdges='1' xaxisname='Division' yaxisname='Admission Count'> [cceWl lang=’csharp’]");
+                //xmlStr3.Append("<chart caption='Zone Wise Pending Admission Due to Events' subcaption='" + year + " & Division: " + DivisionName + " & Zone: " + ZoneName + "' palette='3' canvasbgalpha='0' bgcolor='#DDDDDD' bgalpha='50' showalternatehgridcolor='1' showvalues='1' bgimage='' bgimagealpha='40' bgimagedisplaymode='stretch' theme='fint' showborder='1' bordercolor='#666666' numberPrefix='' useRoundEdges='1' xaxisname='Division' yaxisname='Admission Count'> [cceWl lang=’csharp’]");
+
+                //DataTable dt = ds.Tables[3];
+                //foreach (DataRow dr in dt.Rows)
+                //{
+                //    xmlStr.AppendFormat("<set label='{0}' value='{1}'/>", dr["Source_Center_Name"].ToString(), dr["Sales Count"].ToString(), Server.UrlEncode("TM_Dashboard_Center_Drill.aspx?Acadyear=" + year + "&DivisionCode=" + dr["DivisionCode"].ToString() + "&ZoneCode=" + dr["Zone_Code"].ToString() + "&ZoneName=" + dr["Zone_Name"].ToString() + "&DivisionName=" + DivisionName));
+                //}
+                //xmlStr.Append("[/cceWl]</chart>");
+
+
+                //DataTable dt1 = ds.Tables[11];
+                //foreach (DataRow dr1 in dt1.Rows)
+                //{
+                //    xmlStr1.AppendFormat("<set label='{0}' value='{1}' />", dr1["Source_Center_Name"].ToString(), dr1["Sales Count"].ToString(), Server.UrlEncode("Wait.aspx?year=" + dr1["DivisionCode"].ToString()));
+                //}
+                //xmlStr1.Append("[/cceWl]</chart>");
+
+                //DataTable dt2 = ds.Tables[7];
+                //foreach (DataRow dr2 in dt2.Rows)
+                //{
+                //    xmlStr2.AppendFormat("<set label='{0}' value='{1}' />", dr2["Source_Center_Name"].ToString(), dr2["Sales Count"].ToString(), Server.UrlEncode("Wait.aspx?year=" + dr2["DivisionCode"].ToString()));
+                //}
+                //xmlStr2.Append("[/cceWl]</chart>");
+
+                //DataTable dt3 = ds.Tables[15];
+                //foreach (DataRow dr3 in dt3.Rows)
+                //{
+                //    xmlStr3.AppendFormat("<set label='{0}' value='{1}' />", dr3["Source_Center_Name"].ToString(), dr3["Sales Count"].ToString(), Server.UrlEncode("Wait.aspx?year=" + dr3["DivisionCode"].ToString()));
+                //}
+                //xmlStr3.Append("[/cceWl]</chart>");
+
+                //FusionCharts.SetRenderer("javascript");
+                //Literal0.Text = FusionCharts.RenderChart("FusionChartsXT/Column3D.swf", "", xmlStr.ToString(), "AdmissionCountYearwise", "100%", "", false, true);
+                //Literal2.Text = FusionCharts.RenderChart("FusionChartsXT/Column3D.swf", "", xmlStr1.ToString(), "ConfirmAdmissionDivisionWise", "100%", "", false, true);
+                //Literal1.Text = FusionCharts.RenderChart("FusionChartsXT/Column3D.swf", "", xmlStr2.ToString(), "PendingAdmissionDivisionWise", "100%", "", false, true);
+                //Literal3.Text = FusionCharts.RenderChart("FusionChartsXT/Column3D.swf", "", xmlStr3.ToString(), "PendingAdmissionDivisionWiseDuetoEvents", "100%", "", false, true);
+
+            }
+        }
+        catch (Exception ex)
+        {
+        }
+    }
+}

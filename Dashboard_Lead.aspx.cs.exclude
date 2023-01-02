@@ -1,0 +1,154 @@
+﻿using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.Data;
+using System.Diagnostics;
+using System.Data.SqlClient;
+using System.Configuration;
+using System.Web;
+using System.Web.Security;
+using System.Web.UI;
+using System.Web.UI.WebControls;
+using System.Web.UI.WebControls.WebParts;
+using System.Web.UI.HtmlControls;
+using System.IO;
+using ShoppingCart.BL;
+
+public partial class Dashboard_Lead : System.Web.UI.Page
+{
+    protected void Page_Load(object sender, EventArgs e)
+    {
+        if (!IsPostBack)
+        {
+            if (Request.Cookies["MyCookiesLoginInfo"] != null)
+            {
+                HttpCookie cookie = Request.Cookies.Get("MyCookiesLoginInfo");
+                string UserID = cookie.Values["UserID"];
+                string UserName = cookie.Values["UserName"];
+                divSuccessmessage.Visible = false;
+                divErrormessage.Visible = false;
+                divsearchresults.Visible = true;
+                divmessage.Visible = false;
+                divsearchresults.Visible = false;
+                ScriptManager1.RegisterAsyncPostBackControl(Repeater1);
+                BindSearchResults();
+                Bindlist();
+
+            }
+            else
+            {
+                Response.Redirect("login.aspx");
+            }
+        }
+    }
+
+    private void BindSearchResults()
+    {
+        string Leadtypeid = "All";
+        string Leadsourceid = "All";
+        string leadStatusid = "All";
+        HttpCookie cookie = Request.Cookies.Get("MyCookiesLoginInfo");
+        string UserID = cookie.Values["UserID"];
+        string UserName = cookie.Values["UserName"];
+        string Studentname = "";
+        string Contact_Company = "All";
+        string Contact_Source_Division = "All";
+        string Contact_Source_Zone = "All";
+        string Contact_Source_Center = "All";
+        string Contact_Target_Division = "All";
+        string Contact_Target_Zone = "All";
+        string Contact_Target_Center = "All";
+
+        string Leadcreatedonfrom = "";
+        string Leadcreatedonto = "";
+        string Country = "All";
+        string State = "All";
+        string City = "All";
+
+        string Customertype = "All";
+        string Institutiontype = "All";
+        string Board = "All";
+        string Standard = "All";
+        string Courseinterested = "";
+        string year = "All";
+        lblTargetCompCode.Text = "All";
+        lblTargetDivCode.Text = "All";
+        lblTargetZoanCode.Text = "All";
+        lblTargetCentreCode.Text = "All";
+
+        string followupdatefrom = "";
+        string Followupto = "";
+        
+        int Overdue = 0;
+       
+        
+        
+
+
+        //New Search Criteria
+        string Agefrom = "";
+        string Ageto = "";
+        string block = "";
+        //Dim Onlyblock As String = ""
+        string Examinationdetails = "";
+        string Scoretype = "";
+        string Conditiontype = "";
+        string Score = "";
+        string Gender = "";
+        string acadyear = "";
+        string yeareducation = "";
+        Gender = "All";
+        Agefrom = "";
+        Ageto = "";
+        block = "0";
+        Examinationdetails = "";
+        Scoretype = "All";
+        Conditiontype = "0";
+        Score = "";
+        acadyear = "All";
+        yeareducation = "All";
+
+        DataSet ds = ProductController.Get_Lead_Contact_Search_Results(Leadtypeid, leadStatusid, Leadsourceid, UserID, Contact_Company, Contact_Source_Division, Contact_Source_Zone, Contact_Source_Center, Contact_Target_Division, Contact_Target_Zone,
+        Contact_Target_Center, Studentname, Leadcreatedonfrom, Leadcreatedonto, Country, State, City, Customertype, Institutiontype, Board,
+        Standard, year, Courseinterested, followupdatefrom, Followupto, Overdue, Agefrom, Ageto, block, Examinationdetails,
+        Scoretype, Conditiontype, Score, Gender, acadyear, yeareducation);
+        if (ds.Tables[0].Rows.Count > 0)
+        {
+            
+            divSuccessmessage.Visible = false;
+            divErrormessage.Visible = false;
+            divsearchresults.Visible = true;
+            divmessage.Visible = false;
+            Repeater1.DataSource = ds;
+            Repeater1.DataBind();
+            ScriptManager1.RegisterAsyncPostBackControl(Repeater1);
+
+        }
+        else
+        {
+            divsearchresults.Visible = false;
+            divmessage.Visible = true;
+            lblmessage.Text = "No Records Found!";
+
+        }
+    }
+
+    private void Bindlist()
+    {
+        HttpCookie cookie = Request.Cookies.Get("MyCookiesLoginInfo");
+        string UserID = cookie.Values["UserID"];
+        string UserName = cookie.Values["UserName"];
+        string Leadcompany = "All";
+        DataSet ds = ProductController.Getleadoppsummary(1, UserID, Leadcompany);
+        if (ds.Tables[0].Rows.Count > 0)
+        {
+            dlleadsummary.DataSource = ds;
+            dlleadsummary.DataBind();
+        }
+        else
+        {
+            dlleadsummary.Visible = false;
+        }
+    }
+    
+}

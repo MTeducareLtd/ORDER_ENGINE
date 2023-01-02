@@ -1,0 +1,68 @@
+﻿<%@ Page Language="C#" AutoEventWireup="true" CodeFile="Receipt_Print.aspx.cs" Inherits="Receipt_Print" EnableEventValidation ="true" %>
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head id="Head1" runat="server">
+    <title></title>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <meta content="" name="description"/>
+    <meta content="" name="author"/>
+  
+    <link href="assets/css/bootstrap.min.css" rel="stylesheet" />
+    <link href="assets/css/bootstrap-responsive.min.css" rel="stylesheet" />
+
+    <link rel="stylesheet" href="assets/css/font-awesome.min.css" />
+    <!--[if IE 7]>
+	    <link rel="stylesheet" href="assets/css/font-awesome-ie7.min.css" />
+    <![endif]-->
+
+
+    <!-- page specific plugin styles -->
+		
+
+    <!-- ace styles -->
+    <link rel="stylesheet" href="assets/css/ace.min.css" />
+    <link rel="stylesheet" href="assets/css/ace-responsive.min.css" />
+    <link rel="stylesheet" href="assets/css/ace-skins.min.css" />
+
+
+
+    <style type ="text/css">
+        @media print
+        {
+        h1 {page-break-before:always;}
+        }
+    </style>
+    <style type ="text/css">
+     .ajax__calendar_container
+    {
+        position :absolute;
+        z-index : 400000 !important;
+        /*background-color: #DEF1F4;
+        border:solid 0px #77D5F7;*/
+        border:0px solid #646464;
+        background-color: White;
+        color: red;
+    }
+    
+    </style>
+    <script type="text/javascript">
+        window.onload = function () { window.print(); }
+</script>
+</head>
+<body>
+    <form id="form1" runat="server">
+    <div id="page-content" class="clearfix">
+        <div class="page-content">
+            <div class="row-fluid" id="DivReport" runat="server">
+            </div>
+        </div>
+         <asp:Button ID="btn1" runat="server" OnClick ="btnExport_Click" Text="Print"/>
+    </div>
+    </form>
+   
+</body>
+</html>

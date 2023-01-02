@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Page Title</title>
+<script src="jquery-1.9.1.min.js"></script>
+<script src="jssip.js"></script>
+<script src="sipfunction.js"></script>
+</head>
+<body>
+
+<button onclick="callStart()">Call</button>
+<button onclick="myFunction()">end</button>
+<video id="remoteView" autoplay="" _hidden="true" style="display:none"></video>
+</body>
+</html>
+
+
+
+<script type="text/javascript">
+phonestart( 8001 );
+function callStart(){
+
+  var form_data = {
+        agentExtn      : 8001, 
+        agentId        : 43,
+        agentName      : "c2cagent",
+        customerNumber : 919890496017,
+        customerId     : 6,
+        leadsetId      : 39,
+        leadsetName    : "c2c",
+        campaignId     : 1,
+        campaignName   : "Campaign",
+        processId      : 19,
+        processName    : "click2Call", 
+      }
+  $.post("https://www.voitekk.in/production/callingApis/click2CallExtn",form_data,function(message){
+        console.log(message);
+    });
+}
+
+function callEnd( callLegInfo ){
+
+  console.log(callLegInfo);
+}
+
+function userRegistered(){
+
+}
+
+function userUnregistered(){
+
+}
+
+function userDisconnect(){
+
+}
+function WebSocketConnect(){
+
+}
+function userRegisterationFailed(){
+
+}
+function callAddStream(){
+
+}
+function callConfirmed(){
+
+}
+function callFailed(){
+
+}
+</script>

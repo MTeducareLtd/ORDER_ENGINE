@@ -1,0 +1,13 @@
+LOT NO,Message ID (Bank to fill),Process Date,Initiating Party ID,Instructing Agent Member ID,Instructed Agent Member ID,Instructed Agent Name,Mandate Request ID,Mandate Category,Mandate Category Name,TXN type,"Recurring or One-Off (RCUR, OOFF)",Frequency,First Collection Date,Final Collection Date,Collection Amount,Maximum Amount,Name of Utility/ Biller/ Bank/ Company,Utility Code,Sponsor Bank Code,Debtor Name/Name of Account Holder,Consumer Reference No,Scheme/Plan Reference No,Debtor Telephone No,Debtor Mobile No,Debtor Email Add,Debtor other details,Destination Bank Account Number/ Legal Account Number,Destination Bank Account Type,Destination Bank IFSC/MICR code,Destination Bank Name,UMRN,RES Accepted/Rejected,RES Reason Code,"REJECT REASON(BPO REJECTION,ACK REJECTION RES REJECTION)",Closure Date
+20,MTEDUCARE000002,10/12/2016,,KKBK0RTGSMI,SBIN000019,,,E001,EMI_EducationFees,DEBIT,RCUR,Mnth,10112016,10022017,16000.00,,MT Educare Ltd,12345,KKBK0RTGSMI,Prashant Gajare,OA0222015000593,SNEHA PRASHANT GAJARE,,9969986598,supriyagajare@yahoo.com,,198732646747,SB,SBIN000019,STATE BANK OF BIKANER AND JAIPUR,SBBJ0000000000012348,Accepted,ac01,Default ACK Accept Reason,14/12/2016
+20,MTEDUCARE000003,10/12/2016,,KKBK0RTGSMI,SBIN000026,,,E001,EMI_EducationFees,DEBIT,RCUR,Mnth,10102016,10022017,22000.00,,MT Educare Ltd,12345,KKBK0RTGSMI,SATISH THASALE,OA0222016000026,KAJAL SATISH THASALE,,9930869886,satishthasale@hotmail.com,,4647929742423,CA,SBIN000026,STATE BANK OF BIKANER AND JAIPUR,SBBJ0000000000012354,Accepted,ac01,Default ACK Accept Reason,14/12/2016
+,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,

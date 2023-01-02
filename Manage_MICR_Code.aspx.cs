@@ -1,0 +1,123 @@
+﻿using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.Data;
+using System.Diagnostics;
+using System.Data.SqlClient;
+using System.Configuration;
+using System.Web;
+using System.Web.Security;
+using System.Web.UI;
+using System.Web.UI.WebControls;
+using System.Web.UI.WebControls.WebParts;
+using System.Web.UI.HtmlControls;
+using System.IO;
+using ShoppingCart.BL;
+using Encryption.BL;
+
+public partial class Manage_MICR_Code : System.Web.UI.Page
+{
+    protected void Page_Load(object sender, EventArgs e)
+    {
+        if (!IsPostBack)
+        {
+            GetAllBankDetails();
+        }
+    }
+
+    public void BindBankDetails()
+    {
+        DataSet ds = Reporting.GetBankDetails("1", txtcity.Text.Trim(), txtbank.Text.Trim(), txtbranch.Text.Trim());
+        grdBankDetails.DataSource = ds;
+        grdBankDetails.DataBind();
+    }
+    public void GetAllBankDetails()
+    {
+        DataSet ds = Reporting.GetBankDetails("2", "", "", "");
+        grdBankDetails.DataSource = ds;
+        grdBankDetails.DataBind();
+    }
+
+
+    protected void btnSubmit_Click(object sender, EventArgs e)
+    {
+        lblErrormsg.Visible = false;
+        BindBankDetails();
+    }
+    #  region GridView Event
+    protected void grdBankDetails_RowEditing(object sender, GridViewEditEventArgs e)
+    {
+        grdBankDetails.EditIndex = e.NewEditIndex;
+        BindBankDetails();
+        //GetAllBankDetails();
+    }
+    protected void grdBankDetails_RowCancelingEdit(object sender, GridViewCancelEditEventArgs e)
+    {
+        grdBankDetails.EditIndex = -1;
+        GetAllBankDetails();
+    }
+    protected void grdBankDetails_RowUpdating(object sender, GridViewUpdateEventArgs e)
+    {
+        string micrno = grdBankDetails.DataKeys[e.RowIndex].Value.ToString();
+
+        GridViewRow row = (GridViewRow)grdBankDetails.Rows[e.RowIndex];
+
+        string citycode = ((TextBox)grdBankDetails.Rows[e.RowIndex].FindControl("txtCityCode")).Text.Trim();
+        string bankcode = ((TextBox)grdBankDetails.Rows[e.RowIndex].FindControl("txtBankCode")).Text.Trim();
+        string branchcode = ((TextBox)grdBankDetails.Rows[e.RowIndex].FindControl("txtbranchcode")).Text.Trim();
+        string bankname = ((TextBox)grdBankDetails.Rows[e.RowIndex].FindControl("txtbankname")).Text.Trim();
+        string bankbranch = ((TextBox)grdBankDetails.Rows[e.RowIndex].FindControl("txtbankbranch")).Text.Trim();
+
+        grdBankDetails.EditIndex = -1;
+        DataSet ds = Reporting.Insert_Update_BankDetails("2", citycode, bankcode, branchcode, bankbranch, bankname, micrno);
+        GetAllBankDetails();
+    }
+    protected void grdBankDetails_PageIndexChanging(object sender, GridViewPageEventArgs e)
+    {
+        grdBankDetails.PageIndex = e.NewPageIndex;
+        GetAllBankDetails();
+    }
+    protected void grdBankDetails_RowCommand(object sender, GridViewCommandEventArgs e)
+    {
+        if (e.CommandName == "Insert")
+        {
+            var citycode = grdBankDetails.FooterRow.FindControl("TextBox1") as TextBox;
+            var bankcode = grdBankDetails.FooterRow.FindControl("TextBox2") as TextBox;
+            var branchcode = grdBankDetails.FooterRow.FindControl("TextBox3") as TextBox;
+            var bankname = grdBankDetails.FooterRow.FindControl("TextBox4") as TextBox;
+            var bankbranch = grdBankDetails.FooterRow.FindControl("TextBox5") as TextBox;
+
+            DataSet ds = Reporting.Insert_Update_BankDetails("1", citycode.Text, bankcode.Text, branchcode.Text, bankbranch.Text, bankname.Text, citycode.Text + bankcode.Text + branchcode.Text);
+
+            string userId = string.Empty;
+            string message = string.Empty;
+            userId = ds.Tables[0].Rows[0]["Column1"].ToString();
+
+            switch (userId)
+            {
+                case "-1":
+                    message = "MICRNo already exists.";
+                    break;
+
+                default:
+                    message = "Records successful Inserted";
+                    lblErrormsg.ForeColor = System.Drawing.Color.Green;
+                    break;
+
+
+            }
+            lblErrormsg.Visible = true;
+            lblErrormsg.Text = message;
+            GetAllBankDetails();
+
+        }
+    }
+    #endregion
+    protected void btnClear_Click(object sender, EventArgs e)
+    {
+        txtbank.Text = "";
+        txtbranch.Text = "";
+        txtcity.Text = "";
+        GetAllBankDetails();
+    }
+}

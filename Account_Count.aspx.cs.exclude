@@ -1,0 +1,75 @@
+﻿using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.Data;
+using System.Diagnostics;
+using System.Data.SqlClient;
+using System.Configuration;
+using System.Web;
+using System.Web.Security;
+using System.Web.UI;
+using System.Web.UI.WebControls;
+using System.Web.UI.WebControls.WebParts;
+using System.Web.UI.HtmlControls;
+using System.IO;
+using ShoppingCart.BL;
+using Encryption.BL;
+using ChequeReturnRequest;
+
+public partial class Account_Count : System.Web.UI.Page
+{
+    protected void Page_Load(object sender, EventArgs e)
+    {
+        if (!IsPostBack)
+        {
+            
+            if (Request.Cookies["MyCookiesLoginInfo"] != null)
+            {
+                HttpCookie cookie = Request.Cookies.Get("MyCookiesLoginInfo");
+                string UserID = cookie.Values["UserID"];
+                string UserName = cookie.Values["UserName"];
+                lblpagetitle1.Text = "Account ";
+                lblpagetitle2.Text = "Search Panel";
+                lblmidbreadcrumb.Text = "Account Count";
+                divSuccessmessage.Visible = false;
+                divErrormessage.Visible = false;
+                divpendingreuesterror.Visible = false;
+                upnlsearch.Visible = true;
+                //listudentstatus.Visible = false;
+                btnviewenrollment.Visible = false;
+                //btnviewenv.Visible = false;
+                //btnback.Visible = false;
+                imgstudentphotodisplay.Visible = false;
+                //btnsearchback.Visible = false;
+                string UserCompany = "";
+                SqlDataReader dr1 = UserController.GetCompanyby_Userid(UserID);
+                try
+                {
+                    if ((((dr1) != null)))
+                    {
+                        if (dr1.Read())
+                        {
+                            UserCompany = dr1["Company_Code"].ToString();
+                        }
+                    }
+
+                }
+                catch (Exception ex)
+                {
+                }
+                lblusercompany.Text = UserCompany;
+                divmessage.Visible = false;
+                divSearch.Visible = true;
+                divsearchresults.Visible = false;
+                
+            }
+            else
+            {
+                Response.Redirect("login.aspx");
+            }
+
+        }
+        
+
+    }
+}

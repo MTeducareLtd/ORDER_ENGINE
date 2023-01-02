@@ -1,0 +1,91 @@
+﻿using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.Data;
+using System.Diagnostics;
+using System.Data.SqlClient;
+using System.Configuration;
+using System.Web;
+using System.Web.Security;
+using System.Web.UI;
+using System.Web.UI.WebControls;
+using System.Web.UI.WebControls.WebParts;
+using System.Web.UI.HtmlControls;
+using System.IO;
+using ShoppingCart.BL;
+
+
+public partial class Dashboard_Opportunity_Drill : System.Web.UI.Page
+{
+    protected void Page_Load(object sender, EventArgs e)
+    {
+        if (Request.Cookies["MyCookiesLoginInfo"] != null)
+        {
+            HttpCookie cookie = Request.Cookies.Get("MyCookiesLoginInfo");
+            string UserID = cookie.Values["UserID"];
+            string UserName = cookie.Values["UserName"];
+            divSuccessmessage.Visible = false;
+            divErrormessage.Visible = false;
+            divmessage.Visible = false;
+            BindStudentCategory();
+            
+
+        }
+        else
+        {
+            Response.Redirect("login.aspx");
+        }
+    }
+
+    private void BindStudentCategory()
+    {
+        HttpCookie cookie = Request.Cookies.Get("MyCookiesLoginInfo");
+        string UserID = cookie.Values["UserID"];
+        string UserName = cookie.Values["UserName"];
+        
+        DataSet ds = ProductController.GetStudentCategoryDashboard(UserID);
+        if (ds.Tables[0].Rows.Count > 0)
+        {
+            dlStudentCategory.DataSource = ds.Tables[0];
+            dlStudentCategory.DataBind();
+            if (ds.Tables[1].Rows.Count > 0)
+            {
+                dlStudCountByStream.DataSource = ds.Tables[1];
+                dlStudCountByStream.DataBind();
+            }
+
+        }
+        else
+        {
+            dlStudentCategory.Visible = false;
+            dlStudCountByStream.Visible = false;
+        }
+    }
+
+    protected void OnDataBound(object sender, EventArgs e)
+    {
+        for (int i = dlStudCountByStream.Rows.Count - 1; i > 0; i--)
+        {
+            GridViewRow row = dlStudCountByStream.Rows[i];
+            GridViewRow previousRow = dlStudCountByStream.Rows[i - 1];
+            //for (int j = 0; j < row.Cells.Count; j++)
+            //{
+                if (row.Cells[0].Text == previousRow.Cells[0].Text)
+                {
+                    if (previousRow.Cells[0].RowSpan == 0)
+                    {
+                        if (row.Cells[0].RowSpan == 0)
+                        {
+                            previousRow.Cells[0].RowSpan += 2;
+                        }
+                        else
+                        {
+                            previousRow.Cells[0].RowSpan = row.Cells[0].RowSpan + 1;
+                        }
+                        row.Cells[0].Visible = false;
+                    }
+                }
+            //}
+        }
+    }
+}

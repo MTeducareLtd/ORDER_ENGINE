@@ -1,0 +1,71 @@
+﻿using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.Data;
+using System.Diagnostics;
+using System.Data.SqlClient;
+using System.Configuration;
+using System.Web;
+using System.Web.Security;
+using System.Web.UI;
+using System.Web.UI.WebControls;
+using System.Web.UI.WebControls.WebParts;
+using System.Web.UI.HtmlControls;
+using System.IO;
+using ShoppingCart.BL;
+using System.Web.UI.DataVisualization.Charting;
+using System.Text;
+using InfoSoftGlobal;
+
+public partial class TM_Dashboard_Month_Center_Drill : System.Web.UI.Page
+{
+    protected void Page_Load(object sender, EventArgs e)
+    {
+        if (!IsPostBack)
+        {
+            if (Request.Cookies["MyCookiesLoginInfo"] != null)
+            {
+                HttpCookie cookie = Request.Cookies.Get("MyCookiesLoginInfo");
+                string UserID = cookie.Values["UserID"];
+                string UserName = cookie.Values["UserName"];
+                string year = Request.QueryString["Acadyear"];
+                string DivisionCode = Request.QueryString["DivisionCode"];
+                string DivisionName = Request.QueryString["Division"];
+                string ZoneCode = Request.QueryString["ZoneCode"];
+                string ZoneName = Request.QueryString["Zone"];
+                string CenterCode = Request.QueryString["CenterCode"];
+                string CenterName = Request.QueryString["Center"];
+                lblacadyear.Text = year;
+                lblDivisionname.Text = DivisionName;
+                lblZonename.Text = ZoneName;
+                lblCenterName.Text = CenterName;
+                BindChartsWithoutCategories(year, DivisionCode, DivisionName, ZoneCode, ZoneName,CenterCode);
+            }
+            else
+            {
+                Response.Redirect("login.aspx");
+            }
+
+        }
+    }
+
+    private void BindChartsWithoutCategories(string year, string DivisionCode, string DivisionName, string ZoneCode, string ZoneName,string CenterCode)
+    {
+        try
+        {
+            HttpCookie cookie = Request.Cookies.Get("MyCookiesLoginInfo");
+            string UserID = cookie.Values["UserID"];
+            string UserName = cookie.Values["UserName"];
+            DataSet ds = ProductController.GetDashboardValues_TM_DivisionWise(4, year, DivisionCode, ZoneCode,CenterCode);
+            if (ds.Tables[0].Rows.Count > 0)
+            {
+                string xmlstr = ds.Tables[0].Rows[0]["chart"].ToString();
+                FusionCharts.SetRenderer("javascript");
+                Literal0.Text = FusionCharts.RenderChart("FusionCharts/StackedColumn3DLine.swf", "", xmlstr, "Acad_Year_Admission", "100%", "500", false, true);
+             }
+        }
+        catch (Exception ex)
+        {
+        }
+    }
+}

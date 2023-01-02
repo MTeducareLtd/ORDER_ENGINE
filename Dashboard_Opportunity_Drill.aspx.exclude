@@ -1,0 +1,204 @@
+﻿<%@ Page Title="" Language="C#" MasterPageFile="~/Main.master" AutoEventWireup="true" CodeFile="Dashboard_Opportunity_Drill.aspx.cs" Inherits="Dashboard_Opportunity_Drill" %>
+
+<%@ Register Assembly="AjaxControlToolkit" Namespace="AjaxControlToolkit" TagPrefix="CC1" %>
+<%@ Register Assembly="AjaxControlToolkit" Namespace="AjaxControlToolkit" TagPrefix="asp" %>
+
+<asp:Content ID="Content1" ContentPlaceHolderID="head" Runat="Server">
+</asp:Content>
+<asp:Content ID="Content2" ContentPlaceHolderID="MainContainer" Runat="Server">
+<asp:ScriptManager ID="ScriptManager1" runat="server">
+    </asp:ScriptManager>
+    <div id="page-content" class="clearfix">
+        <div class="page-content">
+            <div class="alert alert-danger" id="divErrormessage" runat="server">
+                <button class="close" data-close="alert">
+                </button>
+                <strong>
+                    <asp:Label ID="lblerrormessage" runat="server"></asp:Label></strong>
+            </div>
+            <div class="alert alert-success" id="divSuccessmessage" runat="server">
+                <button class="close" data-close="alert">
+                </button>
+                <strong>
+                    <asp:Label ID="lblsuccessMessage" runat="server"></asp:Label></strong>
+            </div>
+            <div class="alert alert-danger" id="divmessage" runat="server">
+                <strong>
+                    <asp:Label ID="lblmessage" runat="server"></asp:Label>
+                </strong>
+            </div>
+            <!-- BEGIN PAGE CONTENT FOR SEARCH-->
+            <asp:UpdatePanel ID="upnlsearch" runat="server">
+                <contenttemplate>
+
+                    <div class="row-fluid" id="div3" runat="server">
+                            <div class="span6">
+                            <!-- BEGIN EXAMPLE TABLE PORTLET-->
+                            <div class="widget-box ">
+                               
+                                
+                                <div class="widget-header widget-hea1der-small header-color-dark">
+		                            <h4 class="smaller"><i class="icon-book"></i> Student Category (Opportunity)</h4>
+                                    
+	                          </div>
+                                <div class="widget-body">
+                                    
+                                    <div id="Div2" runat="server" visible="false">
+                                        <asp:Label ID="Label10" runat="server" Text=""></asp:Label>
+                                        <asp:Label ID="Label11" runat="server" Text=""></asp:Label>
+                                        <asp:Label ID="Label12" runat="server" Text=""></asp:Label>
+                                        <asp:Label ID="Label13" runat="server" Text=""></asp:Label>
+                                    </div>
+                                  
+
+                                    <asp:Repeater ID="dlStudentCategory" runat="server">
+                                                <HeaderTemplate>
+                                                    <table class="table table-striped table-bordered table-hover Table4">
+                                                        <thead>
+                                                            <tr>
+                                                                <th>
+                                                                    Center
+                                                                </th>
+                                                                <th style="text-align: center">
+                                                                    MT Student
+                                                                </th>
+                                                                <th style="text-align: center">
+                                                                    Non - MT Student
+                                                                </th>
+                                                                <th style="text-align: center">
+                                                                    MTECT Student
+                                                                </th>
+                                                                <th style="text-align: center">
+                                                                    Total
+                                                                </th>
+                                                            </tr>
+                                                        </thead>
+                                                        <tbody>
+                                                </HeaderTemplate>
+                                                <ItemTemplate>
+                                                    <tr class="odd gradeX">
+                                                        <td>
+                                                            <asp:Label ID="Label1" Text='<%#DataBinder.Eval(Container.DataItem, "Center")%>'
+                                                                runat="server"></asp:Label>
+                                                        </td>
+                                                        <td style="text-align: center">
+                                                            <asp:Label ID="Label2" Text='<%#DataBinder.Eval(Container.DataItem, "[External Entity / Student]")%>'
+                                                                runat="server"></asp:Label>
+                                                        </td>
+                                                        <td style="text-align: center">
+                                                            <asp:Label ID="Label5" Text='<%#DataBinder.Eval(Container.DataItem, "[MT Student]")%>'
+                                                                runat="server"></asp:Label>
+                                                        </td>
+                                                        <td style="text-align: center">
+                                                            <asp:Label ID="Label20" Text='<%#DataBinder.Eval(Container.DataItem, "[MTECT Student]")%>'
+                                                                runat="server"></asp:Label>
+                                                        </td>
+                                                        
+                                                        <td style="text-align: center">
+                                                            <asp:Label ID="Label8" Text='<%#DataBinder.Eval(Container.DataItem, "Total")%>' runat="server"></asp:Label>
+                                                        </td>
+                                                    </tr>
+                                                </ItemTemplate>
+                                                <FooterTemplate>
+                                                    </tbody> </table>
+                                                </FooterTemplate>
+                                            </asp:Repeater>
+
+                                    <asp:Label ID="Label14" runat="server" Visible="false"></asp:Label>
+                                </div>
+                            </div>
+                            <!-- END EXAMPLE TABLE PORTLET-->
+                        </div>
+
+                            <div class="span6">
+                            <!-- BEGIN EXAMPLE TABLE PORTLET-->
+                            <div class="widget-box ">
+                               
+                                
+                                <div class="widget-header widget-hea1der-small header-color-dark">
+		                            <h4 class="smaller"><i class="icon-book"></i> Product Matrix (Student-Product Preferences)</h4>
+                                    
+	                          </div>
+                                <div class="widget-body">
+                                    
+                                    <div id="Div1" runat="server" visible="false">
+                                        <asp:Label ID="Label15" runat="server" Text=""></asp:Label>
+                                        <asp:Label ID="Label16" runat="server" Text=""></asp:Label>
+                                        <asp:Label ID="Label17" runat="server" Text=""></asp:Label>
+                                        <asp:Label ID="Label18" runat="server" Text=""></asp:Label>
+                                    </div>
+
+                                     <div class="widget-main no-padding" style="height: 500px; overflow-y: scroll; overflow-x: none;">
+                                        <asp:GridView ID="dlStudCountByStream" HeaderStyle-BackColor="Silver" HeaderStyle-ForeColor="Black" 
+                                            runat = "server" AutoGenerateColumns="false" OnDataBound="OnDataBound" CssClass="span12" HeaderStyle-Height="40">
+                                            <Columns>
+                                                <asp:BoundField DataField="Center" HeaderText="Center" 
+                                                    ItemStyle-HorizontalAlign="Center" ItemStyle-Width="30%">
+                                                <ItemStyle HorizontalAlign="Center" Width="30%" />
+                                                </asp:BoundField>
+                                                <asp:BoundField DataField="StreamName" HeaderText="StreamName" 
+                                                    ItemStyle-Width="50%">
+                                                <ItemStyle Width="50%" />
+                                                </asp:BoundField>
+                                                <asp:BoundField DataField="Total" HeaderText="Total" 
+                                                    ItemStyle-HorizontalAlign="Center" ItemStyle-Width="20%">
+                                                <ItemStyle HorizontalAlign="Center" Width="20%" />
+                                                </asp:BoundField>
+                                            </Columns>
+                                            <HeaderStyle BackColor="Silver" ForeColor="Black" />
+                                        </asp:GridView>
+                                    </div>
+
+                                  <%--  <asp:Repeater ID="dlStudCountByStream" runat="server" OnItemDataBound="OnDataBound">
+                                                <HeaderTemplate>
+                                                    <table class="table table-striped table-bordered table-hover Table4">
+                                                        <thead>
+                                                            <tr>
+                                                                <th>
+                                                                    Center
+                                                                </th>
+                                                                <th style="text-align: Left">
+                                                                   Stream
+                                                                </th>                                                               
+                                                                <th style="text-align: center">
+                                                                    Total
+                                                                </th>
+                                                            </tr>
+                                                        </thead>
+                                                        <tbody>
+                                                </HeaderTemplate>
+                                                <ItemTemplate>
+                                                    <tr class="odd gradeX">
+                                                        <td>
+                                                            <asp:Label ID="Label1" Text='<%#DataBinder.Eval(Container.DataItem, "Center")%>'
+                                                                runat="server"></asp:Label>
+                                                        </td>
+                                                        <td style="text-align: left">
+                                                            <asp:Label ID="Label2" Text='<%#DataBinder.Eval(Container.DataItem, "StreamName")%>'
+                                                                runat="server"></asp:Label>
+                                                        </td>
+                                                        <td style="text-align: center">
+                                                            <asp:Label ID="Label8" Text='<%#DataBinder.Eval(Container.DataItem, "Total")%>' runat="server"></asp:Label>
+                                                        </td>
+                                                    </tr>
+                                                </ItemTemplate>
+                                                <FooterTemplate>
+                                                    </tbody> </table>
+                                                </FooterTemplate>
+                                            </asp:Repeater>
+--%>
+
+                                      
+                                    <asp:Label ID="Label19" runat="server" Visible="false"></asp:Label>
+                                </div>
+                            </div>
+                            <!-- END EXAMPLE TABLE PORTLET-->
+                        </div>
+                    </div>
+                    
+                </contenttemplate>
+            </asp:UpdatePanel>
+        </div>
+    </div>
+</asp:Content>
+

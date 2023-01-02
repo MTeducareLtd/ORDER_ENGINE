@@ -1,0 +1,17 @@
+﻿<%@ Control Language="C#" AutoEventWireup="true" CodeFile="UC_Menul.ascx.cs" Inherits="UserControl_UC_Menul" %>
+
+
+
+<%@ Register Assembly="AjaxControlToolkit" Namespace="AjaxControlToolkit" TagPrefix="CC1" %>  
+
+
+<!-- BEGIN SIDEBAR -->
+	<div class="page-sidebar-wrapper">
+		<div class="page-sidebar navbar-collapse collapse">
+			<!-- BEGIN SIDEBAR MENU -->
+                <asp:Label ID="lblHeaderMenu" runat="server" Text=""></asp:Label> 
+			
+			<!-- END SIDEBAR MENU -->
+		</div>
+	</div>
+	<!-- END SIDEBAR -->

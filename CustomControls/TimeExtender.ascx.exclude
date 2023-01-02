@@ -1,0 +1,62 @@
+﻿<%@ Control Language="vb" AutoEventWireup="false" CodeBehind="TimeExtender.ascx.vb" Inherits="TimePicker.TimeExtender" %>
+<%@ Register Assembly="AjaxControlToolkit" Namespace="AjaxControlToolkit" TagPrefix="CC1" %>  
+
+<link rel="Stylesheet" href='<%=ResolveControlURL("~/CustomControls/TimeExtender.css") %>' type="text/css" />
+
+<asp:ImageButton ID="ibtnShowPicker" 
+    ImageUrl="btnTimeExtenderBlue.gif"
+    OnClientClick="return false;"
+    CssClass="btnTimeExtender_Style"
+    runat="server" />
+
+<div>
+    
+    <CC1:PopupControlExtender ID="PopupControlExtender_Time"   
+        PopupControlID="datalistTimes"        
+        CommitProperty="value"
+        Position="Bottom"  
+        runat="server" />
+    
+     <asp:DataList ID="datalistTimes"       
+        RepeatDirection="Horizontal"
+        RepeatColumns="4"
+        OnItemDataBound="datalistTimes_OnItemDataBound"
+        CssClass="Datalist_ControlStyle"
+        HeaderStyle-CssClass="Datalist_HeaderStyle"
+        ItemStyle-CssClass="Datalist_ItemStyle"
+        runat="server" >
+
+        <HeaderTemplate> 
+            <div class="Datalist_HeaderLeft">      
+            </div>
+            <div class="Datalist_HeaderCenter">
+            <asp:LinkButton ID="lbtnHeaderTime"
+                OnCommand="lbtnHeaderTime_OnCommand"
+                ToolTip="click to select current time"
+                runat="server" />
+            </div>
+            <div class="Datalist_HeaderRight">
+            <asp:LinkButton ID="lbtnHeaderAM" 
+                Text="AM" 
+                OnCommand="lbtnHeaderAM_OnCommand"  
+                CommandArgument="am"
+                runat="server" />
+            <asp:LinkButton ID="lbtnHeaderPM" 
+                Text="PM" 
+                OnCommand="lbtnHeaderPM_OnCommand"
+                CommandArgument="pm"
+                runat="server" />
+            </div>          
+        </HeaderTemplate>
+       
+        <ItemTemplate>
+        <asp:LinkButton ID="lbtnTime" 
+            CommandName="second" 
+            OnCommand="lbtnTime_Onclick" 
+            CommandArgument='<%# Eval("Time") %>' 
+            Text='<%# Eval("Time") %>'
+            runat="server"/>         
+        </ItemTemplate>
+    </asp:DataList>   
+
+</div>

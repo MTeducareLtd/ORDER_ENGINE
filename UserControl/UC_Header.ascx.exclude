@@ -1,0 +1,124 @@
+﻿<%@ Control Language="C#" AutoEventWireup="true" CodeFile="UC_Header.ascx.cs" Inherits="UserControl_UC_Header" %>
+
+
+<%@ Register Assembly="AjaxControlToolkit" Namespace="AjaxControlToolkit" TagPrefix="CC1" %>  
+
+<%--<script type="text/javascript">
+    tday = new Array("Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday");
+    tmonth = new Array("January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December");
+
+    function GetClock() {
+        d = new Date();
+        nday = d.getDay();
+        nmonth = d.getMonth();
+        ndate = d.getDate();
+        nyear = d.getYear();
+        nhour = d.getHours();
+        nmin = d.getMinutes();
+        nsec = d.getSeconds();
+
+        if (nyear < 1000) nyear = nyear + 1900;
+
+        if (nhour == 0) { ap = " AM"; nhour = 12; }
+        else if (nhour <= 11) { ap = " AM"; }
+        else if (nhour == 12) { ap = " PM"; }
+        else if (nhour >= 13) { ap = " PM"; nhour -= 12; }
+
+        if (nmin <= 9) { nmin = "0" + nmin; }
+        if (nsec <= 9) { nsec = "0" + nsec; }
+        
+        document.getElementById('clockbox').innerHTML = "" + tday[nday] + ", " + tmonth[nmonth] + " " + ndate + ", " + nyear + " " + nhour + ":" + nmin + ":" + nsec + ap + "";
+        setTimeout("GetClock()", 1000);
+    }
+    window.onload = GetClock;
+</script>--%>
+
+<!-- BEGIN HEADER -->
+<div class="header navbar navbar-inverse navbar-fixed-top">
+	<!-- BEGIN TOP NAVIGATION BAR -->
+	<div class="header-inner">
+		<!-- BEGIN LOGO -->
+		<a class="navbar-brand" href="http://www.mteducare.com" target ="_blank" ><%--<asp:Label ID="lbllogo" runat ="server" CssClass ="img-responsive">--%><b><asp:Label ID="lblcompanyname" runat ="server"></asp:Label></b><%--</asp:Label>--%>
+		<asp:Label ID="lblusercompany" runat ="server" Visible ="false" ></asp:Label>
+		</a>
+		<!-- END LOGO -->
+		<!-- BEGIN RESPONSIVE MENU TOGGLER -->
+        <a href="javascript:;" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+		<img src="assets/img/menu-toggler.png" alt=""/>
+		</a>
+		
+         <ul class="nav navbar-nav pull-right">
+            <!-- BEGIN NOTIFICATION DROPDOWN -->
+			<%--<li class="dropdown" id="header_notification_bar">
+                <a href="#" class="dropdown-toggle" data-toggle="dropdown" data-hover="dropdown" data-close-others="true">
+				<span class="badge" id="clockbox" style="text-align: center;">
+					</span>
+				</a>
+			</li>--%>
+            <li class="dropdown" id="header_notification_bar">
+				<a href="#" class="dropdown-toggle" data-toggle="dropdown" data-hover="dropdown" data-close-others="true">
+				<i class="fa fa-warning"></i>
+				<%--<span class="badge">
+					14
+				</span>--%>
+				</a>
+				<ul class="dropdown-menu extended notification">
+					<li>
+						<p>
+							Pending Follow-Up
+						</p>
+					</li>
+					<li>
+						<ul class="dropdown-menu-list scroller" style="height: 85px;">
+							<li>
+								<a href="Followup_Search_Results_Lead.aspx">
+								<span class="label label-sm label-icon label-success">
+									<i class="fa fa-plus"></i>
+								</span>
+								 Pending Lead Followup
+								<%--<span class="time">
+									14
+								</span>--%>
+								</a>
+							</li>
+							<li>
+								<a href="Followup_Search_Results_Opportunity.aspx">
+								<span class="label label-sm label-icon label-danger">
+									<i class="fa fa-bolt"></i>
+								</span>
+								 Pending Opportunity Followup
+								<%--<span class="time">
+									20
+								</span>--%>
+								</a>
+							</li>
+							
+						</ul>
+					</li>
+					<%--<li class="external">
+						<a href="#">See all notifications <i class="m-icon-swapright"></i></a>
+					</li>--%>
+				</ul>
+			</li>
+            <li class="dropdown user">
+				<a href="#" class="dropdown-toggle" data-toggle="dropdown" data-hover="dropdown" data-close-others="true">
+				<img alt="" src="assets/img/Avatar1_Smallest.jpg" width="20px" height ="20px" />
+				<span class="username"><asp:Label ID="lblusername" runat ="server"></asp:Label></span><i class="fa fa-angle-down"></i></a>
+				<ul class="dropdown-menu">
+					
+				<!--<li><a href="#"><i class="fa fa-calendar"></i> My Calendar</a></li>-->
+				<!--<li><a href="inbox.html"><i class="fa fa-envelope"></i> My Inbox <span class="badge badge-danger">3</span></a></li>-->
+					<!--<li><a href="#"><i class="fa fa-tasks"></i> My Tasks<span class="badge badge-success">7</span></a></li>-->
+                    <li><a href="GeneralSettings.aspx"><i class="fa fa-asterisk"></i> General User Settings</a></li>
+					<li><a href="Lock.aspx"><i class="fa fa-lock"></i> Lock Screen</a></li>
+					<li><a href="Logout.aspx"><i class="fa fa-key"></i> Log Out</a></li>
+				</ul>
+			</li>
+        </ul>
+		<!-- END TOP NAVIGATION MENU -->
+	</div>
+	<!-- END TOP NAVIGATION BAR -->
+</div>
+<!-- END HEADER -->
+
+

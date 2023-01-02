@@ -1,0 +1,78 @@
+﻿using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.Data;
+using System.Diagnostics;
+//using Exportxls.BL;
+using System.Data.SqlClient;
+using System.Configuration;
+using System.Web;
+using System.Web.Security;
+using System.Web.UI;
+using System.Web.UI.WebControls;
+using System.Web.UI.WebControls.WebParts;
+using System.Web.UI.HtmlControls;
+using System.IO;
+using ShoppingCart.BL;
+using Encryption.BL;
+using iTextSharp.text;
+using iTextSharp.text.pdf;
+
+public partial class Rcpt_Print : System.Web.UI.Page
+{
+   protected void Page_Load(object sender, EventArgs e)
+   {
+       try
+       {
+           if (!IsPostBack)
+           {
+               string Menuid = "117";
+               if (Request.Cookies["MyCookiesLoginInfo"] != null)
+               {
+                    HttpCookie cookie = Request.Cookies.Get("MyCookiesLoginInfo");
+                    string UserID = cookie.Values["UserID"];
+                    string UserName = cookie.Values["UserName"];
+                }
+                else
+                {
+                    Response.Redirect("login.aspx");
+              }
+            }
+        }
+        catch (Exception ex)
+        {
+        }
+        string SBECode = null;
+        SBECode = Request.QueryString["SBECode"]; // Encryption_Decryption.decryptQueryString(Request.QueryString["SBECode"]);
+        string PPCode = null;
+        PPCode = Request.QueryString["PPCode"]; // Encryption_Decryption.decryptQueryString(Request.QueryString["PPCode"]);
+        string[] SPECodeSplit = null;
+        SPECodeSplit = SBECode.Split(',');
+        int SBECount = 0;
+        SBECount = GetSubstringCount(SBECode, ",", false);
+        int cnt = 0;
+        string FinalOutputStr = "";
+             
+       //Get the HTML code from your database or whereever you have stored it and store
+        //it in HTMLCode variable.
+          
+    }
+            
+
+    public int GetSubstringCount(string strToSearch, string strToLookFor, bool bolCaseSensative)
+    {
+        int functionReturnValue = 0;
+        if (bolCaseSensative)
+        {
+            functionReturnValue = strToSearch.Split(',').GetUpperBound(0);
+        }
+        else
+        {
+            functionReturnValue = strToSearch.ToUpper().Split(',').GetUpperBound(0);
+        }
+        return functionReturnValue;
+    }
+
+
+}
+   

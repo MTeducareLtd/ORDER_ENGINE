@@ -1,0 +1,141 @@
+﻿body {
+}
+
+.Datalist_ControlStyle
+{
+	border:1px solid #BDBDBD;
+	background-color:#f2f5ed; /* must match .Datalist_ItemStyle a:link background color */
+	text-align:center;    
+}
+
+.Datalist_HeaderStyle
+{	
+	border:1px solid #226e0f;
+	background-color:#f2f5ed;
+	color:black;
+}
+
+/* Center header text and position buttons to right */
+/* add styles in links section */
+.Datalist_HeaderLeft
+{
+	display:inline;
+	width:33%;
+}
+.Datalist_HeaderCenter
+{
+	display:inline;
+	width:33%;
+}
+.Datalist_HeaderRight
+{
+	display:inline;
+	width:33%;
+	text-align:right;
+	padding-right:5px;	
+}
+
+/* must be in this order: link, visited, hover, active */
+.Datalist_HeaderStyle a:link
+{
+	color:#424242;
+	background-color:#f2f5ed;
+	text-decoration:none;
+	border:1px solid blue;
+	font-size:11px;	
+}
+.Datalist_HeaderStyle a:visited
+{
+	color:#424242;
+	text-decoration:none;
+	font-size:11px;
+}
+.Datalist_HeaderStyle a:hover
+{
+	color:Black;
+	font-size:11px;
+	border:1px solid blue;
+}
+.Datalist_HeaderStyle a:active
+{
+	color:#424242;
+	text-decoration:none;
+	font-size:11px;
+}
+
+/* be sure you change code behind item style below to match */
+.Datalist_ItemStyle
+{
+	width:50px;
+	font-size:11px;
+	text-align:right;  /* when leading zeros is false */
+}
+/* must be in this order: link, visited, hover, active */
+.Datalist_ItemStyle a:link
+{
+	color:#424242;
+	text-decoration:none;
+	white-space:nowrap;
+	border:1px solid #f2f5ed;  /* prevent padding from moving - must match panel background color */
+}
+.Datalist_ItemStyle a:visited
+{
+	color:#424242;
+	text-decoration:none;
+	white-space:nowrap;
+	border:1px solid #f2f5ed;
+}
+.Datalist_ItemStyle a:hover
+{
+	color:Blue;	
+	white-space:nowrap;
+	border:1px solid blue;
+}
+.Datalist_ItemStyle a:active
+{
+	color:#424242;
+	text-decoration:none;
+	white-space:nowrap;
+	border:1px solid #f2f5ed;
+}
+
+/* not used - highlights selected time in code behind onitemdatabound */
+.Datalist_ItemStyle_CodeBehind
+{
+	width:50px;
+	font-size:11px;
+	text-align:right;  /* when leading zeros is false */
+}
+.Datalist_ItemStyle_CodeBehind a:link
+{
+	color:#424242;
+	text-decoration:none;
+	white-space:nowrap;
+	border:1px solid blue;
+}
+.Datalist_ItemStyle_CodeBehind a:visited
+{
+	color:#424242;
+	text-decoration:none;
+	white-space:nowrap;
+	border:1px solid #f2f5ed;
+}
+.Datalist_ItemStyle_CodeBehind a:hover
+{
+	color:Black;	
+	white-space:nowrap;
+	border:1px solid blue;
+}
+.Datalist_ItemStyle_CodeBehind a:active
+{
+	color:#424242;
+	text-decoration:none;
+	white-space:nowrap;
+	border:1px solid #f2f5ed;
+}
+/* end not used */
+
+.btnTimeExtender_Style 
+{
+	vertical-align:top;
+}

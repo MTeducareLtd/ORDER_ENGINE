@@ -1,0 +1,161 @@
+﻿<%@ Page Title="" Language="C#" MasterPageFile="~/Main.master" AutoEventWireup="true"
+    CodeFile="TM_Dashboard.aspx.cs" Inherits="TM_Dashboard" %>
+
+<asp:Content ID="Content1" ContentPlaceHolderID="head" runat="Server">
+    <script src="fusioncharts-n-xt-developer/js/fusioncharts.js" type="text/javascript"></script>
+    <script src="fusioncharts-n-xt-developer/js/fusioncharts.charts.js" type="text/javascript"></script>
+    <script src="fusioncharts-n-xt-developer/js/fusioncharts.widgets.js" type="text/javascript"></script>
+    <script src="fusioncharts-n-xt-developer/js/fusioncharts.powercharts.js" type="text/javascript"></script>
+</asp:Content>
+<asp:Content ID="Content2" ContentPlaceHolderID="MainContainer" runat="Server">
+    <div id="page-content" class="clearfix">
+        <div class="page-header position-relative">
+            <h1>
+                Top Management Dashboard <small><i class="icon-double-angle-right"></i> Overview & Stats</small>
+                <div class="nav ace-nav pull-right">
+                  <small> Segment</small> 
+                  <asp:DropDownList ID="ddlselect" runat="server" data-placeholder="Select" AutoPostBack="true" OnSelectedIndexChanged="ddlselect_SelectedIndexChanged">
+                    <asp:ListItem Value="0" Text="MT Educare" Selected="True"></asp:ListItem>
+                    <asp:ListItem Value="1" Text="E-Commerce Sales"></asp:ListItem>
+                    
+                  </asp:DropDownList>
+                </div>
+            </h1>
+        </div>
+        <div class="row-fluid" id="divmteducare" runat="server">
+            <div class="space-6">
+            </div>
+            <div class="row-fluid">
+                <%--<div class="span6">
+                    <div class="widget-box">
+                        <div class="widget-header widget-header-flat widget-header-small">
+                            <h5>
+                                <i class="icon-bar-chart"></i>Academic Year Wise Analysis</h5>
+                        </div>
+                        <div class="widget-body">
+                            <div class="widget-main">
+                                <asp:Literal ID="Literal0" runat="server">        
+                                </asp:Literal>
+                            </div>
+                            <!--/widget-main-->
+                        </div>
+                    </div>
+                    <!--/widget-box-->
+                </div>--%>
+                <!--/span-->
+                <div class="span12">
+                    <div class="widget-box">
+                        <div class="widget-header widget-header-flat widget-header-small">
+                            <h5>
+                                <i class="icon-bar-chart"></i>Admission Status</h5>
+                        </div>
+                        <div class="widget-body">
+                            <div class="widget-main">
+                                <asp:Literal ID="Literal2" runat="server">        
+                                </asp:Literal>
+                            </div>
+                            <!--/widget-main-->
+                        </div>
+                    </div>
+                    <!--/widget-box-->
+                </div>
+                <%--<div class="span3">
+                    <div class="widget-box">
+                        <div class="widget-header widget-header-flat widget-header-small">
+                            <h5>
+                                <i class="icon-bar-chart"></i>Pending Admission</h5>
+                        </div>
+                        <div class="widget-body">
+                            <div class="widget-main">
+                                <asp:Literal ID="Literal1" runat="server">        
+                                </asp:Literal>
+                            </div>
+                            <!--/widget-main-->
+                        </div>
+                    </div>
+                    <!--/widget-box-->
+                </div>--%>
+                <%--<div class="span3">
+                    <div class="widget-box">
+                        <div class="widget-header widget-header-flat widget-header-small">
+                            <h5>
+                                <i class="icon-bar-chart"></i>Pending Due to Events</h5>
+                        </div>
+                        <div class="widget-body">
+                            <div class="widget-main">
+                                <asp:Literal ID="Literal3" runat="server">        
+                                </asp:Literal>
+                            </div>
+                            <!--/widget-main-->
+                        </div>
+                    </div>
+                    <!--/widget-box-->
+                </div>--%>
+            </div>
+            <!--/row-->
+            <div class="hr hr32 hr-dotted">
+            </div>
+            <div class="row-fluid">
+                <div class="span12">
+                    <div class="widget-box">
+                        <div class="widget-header widget-header-flat widget-header-small">
+                            <h5>
+                                <i class="icon-bar-chart"></i>Academic Year-Division Wise Admission Count</h5>
+                        </div>
+                        <div class="widget-body">
+                            <div class="widget-main">
+                                <asp:Literal ID="Literal4" runat="server">        
+                                </asp:Literal>
+                            </div>
+                            <!--/widget-main-->
+                        </div>
+                    </div>
+                    <!--/widget-box-->
+                </div>
+                <!--/span-->
+            </div>
+        </div>
+        <div class="row-fluid" id="divecommerce" runat="server">
+            <div class="row-fluid">
+                <div class="span12">
+                    <div class="widget-box">
+                        <div class="widget-header widget-header-flat widget-header-small">
+                            <h5>
+                                <i class="icon-bar-chart"></i>Yearly Sales Analysis</h5>
+                        </div>
+                        <div class="widget-body">
+                            <div class="widget-main">
+                                <asp:Literal ID="Literal5" runat="server">        
+                                </asp:Literal>
+                            </div>
+                            <!--/widget-main-->
+                        </div>
+                    </div>
+                    <!--/widget-box-->
+                </div>
+                <!--/span-->
+                
+            </div>
+            <div class="row-fluid">
+                <div class="span12">
+                    <div class="widget-box">
+                        <div class="widget-header widget-header-flat widget-header-small">
+                            <h5>
+                                <i class="icon-bar-chart"></i>Product Wise Sales Analysis</h5>
+                        </div>
+                        <div class="widget-body">
+                            <div class="widget-main">
+                                <asp:Literal ID="Literal6" runat="server">        
+                                </asp:Literal>
+                            </div>
+                            <!--/widget-main-->
+                        </div>
+                    </div>
+                    <!--/widget-box-->
+                </div>
+                <!--/span-->
+                
+            </div>
+        </div>
+    </div>
+</asp:Content>

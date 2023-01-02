@@ -1,0 +1,85 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Web;
+using System.Web.UI;
+using System.Web.UI.WebControls;
+using System.IO;
+using System.Data;
+using ShoppingCart.BL;
+
+public partial class ContactImageUpload : System.Web.UI.Page
+{
+    protected void Page_Load(object sender, EventArgs e)
+    {
+        Msg_Error.Visible = false;
+        Msg_Success.Visible = false;
+        lblSuccess.Text = "";
+        lblerror.Text = "";
+    }
+    protected void btnUpload_Click(object sender, EventArgs e)
+    {
+        try
+        {
+            if (fileContact.PostedFile != null)
+            {
+                if (fileContact.HasFile)
+                {
+                    string strFilePath = "images/studentphoto/";
+                    string strFileName = "";
+                    FileInfo fi = new FileInfo(fileContact.FileName);
+                    string ext = fi.Extension.ToLower().Trim();
+
+                    if (ext == ".jpg" || ext == ".png" || ext == ".gif" || ext == ".jpeg" || ext == ".bitmap")
+                    {
+
+                        if (!System.IO.Directory.Exists(Server.MapPath(strFilePath)))
+                        {
+                            System.IO.Directory.CreateDirectory(Server.MapPath(strFilePath));
+                        }
+                         DataSet ds = ProductController.UpdateImagePath("051112013000027", ext);
+                        if (ds != null)
+                        {
+                            if (ds.Tables.Count != 0)
+                            {
+                                strFileName = ds.Tables[0].Rows[0]["ImagePath"].ToString();
+                                fileContact.SaveAs(Server.MapPath(strFilePath + strFileName));
+                                Msg_Success.Visible = true;
+                                Msg_Error.Visible = false;
+                                lblSuccess.Text = "File uploaded successfully";
+
+                                
+                            }
+                        }
+                        
+                    }
+                    else
+                    {
+                        Msg_Error.Visible = true;
+                        Msg_Success.Visible = false;
+                        lblerror.Text = "Invalid File";
+                    }
+                }
+                else
+                {
+                    Msg_Error.Visible = true;
+                    Msg_Success.Visible = false;
+                    lblerror.Text = "Please upload File";
+
+                }
+            }
+            else
+            {
+                Msg_Error.Visible = true;
+                Msg_Success.Visible = false;
+                lblerror.Text = "Please upload File";
+            }
+        }
+        catch (Exception ex)
+        {
+            Msg_Error.Visible = true;
+            Msg_Success.Visible = false;
+            lblerror.Text = ex.ToString(); 
+        }
+    }
+}

@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<discovery xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://schemas.xmlsoap.org/disco/">
+  <contractRef ref="http://mtelpdc.shvetankinfotech.com/MTEL_ChequeReturnRequest.asmx?wsdl" docRef="http://mtelpdc.shvetankinfotech.com/MTEL_ChequeReturnRequest.asmx" xmlns="http://schemas.xmlsoap.org/disco/scl/" />
+  <soap address="http://mtelpdc.shvetankinfotech.com/MTEL_ChequeReturnRequest.asmx" xmlns:q1="http://MTELPDC.shvetankinfotech.com/" binding="q1:MTEL_ChequeReturnRequestSoap" xmlns="http://schemas.xmlsoap.org/disco/soap/" />
+  <soap address="http://mtelpdc.shvetankinfotech.com/MTEL_ChequeReturnRequest.asmx" xmlns:q2="http://MTELPDC.shvetankinfotech.com/" binding="q2:MTEL_ChequeReturnRequestSoap12" xmlns="http://schemas.xmlsoap.org/disco/soap/" />
+</discovery>

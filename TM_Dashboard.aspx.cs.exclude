@@ -1,0 +1,303 @@
+﻿using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.Data;
+using System.Diagnostics;
+using System.Data.SqlClient;
+using System.Configuration;
+using System.Web;
+using System.Web.Security;
+using System.Web.UI;
+using System.Web.UI.WebControls;
+using System.Web.UI.WebControls.WebParts;
+using System.Web.UI.HtmlControls;
+using System.IO;
+using ShoppingCart.BL;
+using System.Web.UI.DataVisualization.Charting;
+using System.Text;
+using InfoSoftGlobal;
+
+
+public partial class TM_Dashboard : System.Web.UI.Page
+{
+    protected void Page_Load(object sender, EventArgs e)
+    {
+        if (!IsPostBack)
+        {
+            if (Request.Cookies["MyCookiesLoginInfo"] != null)
+            {
+                HttpCookie cookie = Request.Cookies.Get("MyCookiesLoginInfo");
+                string UserID = cookie.Values["UserID"];
+                string UserName = cookie.Values["UserName"];
+                if (ddlselect.SelectedValue == "0")
+                {
+                    divmteducare.Visible = true;
+                    divecommerce.Visible = false;
+                    BindChartsWithoutCategories();
+                    BindChartsWithCategories();
+                }
+                else if (ddlselect.SelectedValue == "1")
+                {
+                    divecommerce.Visible = true;
+                    divmteducare.Visible = false;
+                    BindChartsforEcommercePortalData();
+                }
+            }
+            else
+            {
+                Response.Redirect("login.aspx");
+            }
+
+        }
+    }
+
+    protected void ddlselect_SelectedIndexChanged(object sender, System.EventArgs e)
+    {
+        if (ddlselect.SelectedValue == "0")
+        {
+            divmteducare.Visible = true;
+            divecommerce.Visible = false;
+            BindChartsWithoutCategories();
+            BindChartsWithCategories();
+        }
+        else if (ddlselect.SelectedValue == "1")
+        {
+            divecommerce.Visible = true;
+            divmteducare.Visible = false;
+            BindChartsforEcommercePortalData();
+            BindChartsWithEcommerceCategories();
+        }
+
+    }
+    private void BindChartsWithoutCategories()
+    {
+
+        try
+        {
+            HttpCookie cookie = Request.Cookies.Get("MyCookiesLoginInfo");
+            string UserID = cookie.Values["UserID"];
+            string UserName = cookie.Values["UserName"];
+            DataSet ds = ProductController.GetDashboardValues_TM(UserID, 1,"","","");
+            if (ds.Tables[0].Rows.Count > 0)
+            {
+                DataSet ds1 = ProductController.GetDashboardValues_TM("", 5, "", "", "");
+                string xmlstr1 = ds1.Tables[0].Rows[0]["chart"].ToString();
+                FusionCharts.SetRenderer("javascript");
+                Literal2.Text = FusionCharts.RenderChart("FusionCharts/StackedColumn3DLine.swf", "", xmlstr1, "Acad_Year_Admission", "100%", "500", false, true);
+        
+                //StringBuilder xmlStr = new StringBuilder();
+                //StringBuilder xmlStr1 = new StringBuilder();
+                //StringBuilder xmlStr2 = new StringBuilder();
+                //StringBuilder xmlStr3 = new StringBuilder();
+                //StringBuilder xmlStr4 = new StringBuilder();
+
+                //xmlStr.Append("<chart caption='Company Wise Admission Count' subcaption='Acad-Year Wise' palette='3' canvasbgalpha='0' bgcolor='#DDDDDD' bgalpha='50' showalternatehgridcolor='1' showvalues='1' bgimage='' bgimagealpha='40' bgimagedisplaymode='stretch' theme='fint' showborder='1' bordercolor='#666666' numberPrefix='' useRoundEdges='1' xaxisname='Academic Year' yaxisname='Count'> [cceWl lang=’csharp’]");
+                //xmlStr.Append("<chart caption='Academic-Year Wise Admission Count' subcaption='' palette='3' showalternatehgridcolor='1' alternatehgridcolor='ff5904' divlinecolor='ff5904' divlinealpha='20' alternatehgridalpha='5' canvasbordercolor='666666' canvasborderthickness='1' basefontcolor='666666' linecolor='FF5904' linealpha='85' showvalues='1' rotatevalues='1' valueposition='auto' canvaspadding='8' bgcolor='ffffff' valuepadding='5' showborder='0' xaxisname='Academic Year' yaxisname='Count'> [cceWl lang=’csharp’]");
+                //xmlStr1.Append("<chart caption='Academic-Year Wise Pending Admission' subcaption='' palette='3' canvasbgalpha='0' bgcolor='#DDDDDD' bgalpha='50' showalternatehgridcolor='1' showvalues='1' bgimage='' bgimagealpha='40' bgimagedisplaymode='stretch' theme='fint' showborder='1' bordercolor='#666666' numberPrefix='' useRoundEdges='1' xaxisname='Academic Year' yaxisname='Count'> [cceWl lang=’csharp’]");
+                //xmlStr2.Append("<chart caption='Academic-Year Wise Confirm Admission' subcaption='' palette='3' canvasbgalpha='0' bgcolor='#DDDDDD' bgalpha='50' showalternatehgridcolor='1' showvalues='1' bgimage='' bgimagealpha='40' bgimagedisplaymode='stretch' theme='fint' showborder='1' bordercolor='#666666' numberPrefix='' useRoundEdges='1' xaxisname='Academic Year' yaxisname='Count'> [cceWl lang=’csharp’]");
+                //xmlStr3.Append("<chart caption='Academic-Year Wise Pending Admission Due to Events' subcaption='' palette='3' canvasbgalpha='0' bgcolor='#DDDDDD' bgalpha='50' showalternatehgridcolor='1' showvalues='1' bgimage='' bgimagealpha='40' bgimagedisplaymode='stretch' theme='fint' showborder='1' bordercolor='#666666' numberPrefix='' useRoundEdges='1' xaxisname='Academic Year' yaxisname='Count'> [cceWl lang=’csharp’]");
+
+                //DataTable dt = ds.Tables[0];
+                //foreach (DataRow dr in dt.Rows)
+                //{
+                //    xmlStr.AppendFormat("<set label='{0}' value='{1}' link='{2}'/>", dr["Year"].ToString(), dr["Sales Count"].ToString(), Server.UrlEncode("TM_Dashboard_Drill.aspx?Acadyear=" + dr["Year"].ToString()));
+                //    //For Adding Link Below
+                //    //xmlStr.AppendFormat("<set label='{0}' value='{1}' link='{2}'/>", dr["Lead_status_desc"].ToString(), dr["Lead_Count"].ToString(), Server.UrlEncode("DrillDown.aspx?year=" + dr["Lead_status_desc"].ToString()));
+
+                //}
+                //xmlStr.Append("[/cceWl]</chart>");
+               
+
+                //DataTable dt1 = ds.Tables[4];
+                //foreach (DataRow dr1 in dt1.Rows)
+                //{
+                //    xmlStr1.AppendFormat("<set label='{0}' value='{1}' link='{2}' />", dr1["Year"].ToString(), dr1["Sales Count"].ToString(), Server.UrlEncode("TM_Dashboard_Drill.aspx?Acadyear=" + dr1["Year"].ToString()));
+                //    //For Adding Link Below
+                //    //xmlStr.AppendFormat("<set label='{0}' value='{1}' link='{2}'/>", dr["Lead_status_desc"].ToString(), dr["Lead_Count"].ToString(), Server.UrlEncode("DrillDown.aspx?year=" + dr["Lead_status_desc"].ToString()));
+
+                //}
+                //xmlStr1.Append("[/cceWl]</chart>");
+
+                //DataTable dt2 = ds.Tables[8];
+                //foreach (DataRow dr2 in dt2.Rows)
+                //{
+                //    xmlStr2.AppendFormat("<set label='{0}' value='{1}' link='{2}' />", dr2["Year"].ToString(), dr2["Sales Count"].ToString(), Server.UrlEncode("TM_Dashboard_Drill.aspx?Acadyear=" + dr2["Year"].ToString()));
+                //    //For Adding Link Below
+                //    //xmlStr.AppendFormat("<set label='{0}' value='{1}' link='{2}'/>", dr["Lead_status_desc"].ToString(), dr["Lead_Count"].ToString(), Server.UrlEncode("DrillDown.aspx?year=" + dr["Lead_status_desc"].ToString()));
+
+                //}
+                //xmlStr2.Append("[/cceWl]</chart>");
+
+                //DataTable dt3 = ds.Tables[12];
+                //foreach (DataRow dr3 in dt3.Rows)
+                //{
+                //    xmlStr3.AppendFormat("<set label='{0}' value='{1}' link='{2}'/>", dr3["Year"].ToString(), dr3["Sales Count"].ToString(), Server.UrlEncode("TM_Dashboard_Drill.aspx?Acadyear=" + dr3["Year"].ToString()));
+                //    //For Adding Link Below
+                //    //xmlStr.AppendFormat("<set label='{0}' value='{1}' link='{2}'/>", dr["Lead_status_desc"].ToString(), dr["Lead_Count"].ToString(), Server.UrlEncode("DrillDown.aspx?year=" + dr["Lead_status_desc"].ToString()));
+
+                //}
+                //xmlStr3.Append("[/cceWl]</chart>");
+
+
+
+
+                // Set the rendering mode to JavaScript, from the default Flash.
+                //FusionCharts.SetRenderer("javascript");
+                //Literal0.Text = FusionCharts.RenderChart("FusionChartsXT/Line.swf", "", xmlStr.ToString(), "AdmissionCountYearwise", "100%", "", false, true);
+                ////Literal1.Text = FusionCharts.RenderChart("FusionChartsXT/Column3D.swf", "", xmlStr1.ToString(), "PendingAdmissionCountYearwise", "100%", "", false, true);
+                //Literal2.Text = FusionCharts.RenderChart("FusionChartsXT/Column3D.swf", "", xmlStr2.ToString(), "ConfirmAdmissionCountYearwise", "100%", "", false, true);
+                //Literal3.Text = FusionCharts.RenderChart("FusionChartsXT/Column3D.swf", "", xmlStr3.ToString(), "PendingAdmissionDuetoEvents", "100%", "", false, true);
+
+
+
+            }
+
+        }
+        catch (Exception ex)
+        {
+
+        }
+    }
+
+    private void BindChartsWithCategories()
+    {
+        try
+        {
+            HttpCookie cookie = Request.Cookies.Get("MyCookiesLoginInfo");
+            string UserID = cookie.Values["UserID"];
+            string UserName = cookie.Values["UserName"];
+            DataSet ds = ProductController.GetDashboardValues_TM(UserID, 2,"","","");
+            int i = 0;
+            if ((ds.Tables[0].Rows.Count > 0) && (ds.Tables[1].Rows.Count > 0))
+            {
+                StringBuilder xmlStr = new StringBuilder();
+                // Initialize the chart-level attributes and append them to the
+                //`xmlData` StringBuilder object.
+                //xmlStr.Append("<chart caption='Year Division Wise' subCaption='Sales Analysis' showBorder='1' formatNumberScale='0' rotatelabels='1' showvalues='0' ");
+                xmlStr.Append("<chart caption='Academic Year - Division Wise' subcaption='Admission Count Analysis' palette='3' canvasbgalpha='0' bgcolor='#DDDDDD' bgalpha='50' showalternatehgridcolor='1' showvalues='1' bgimage='' bgimagealpha='40' bgimagedisplaymode='stretch' theme='fint' showborder='1' bordercolor='#666666' numberPrefix='' useRoundEdges='1' xaxisname='Year' yaxisname='Count'> [cceWl lang=’csharp’]");
+                // Initialize the `<categories>` element.
+                xmlStr.AppendFormat("<categories>");
+                // Append this data to the `xmlData` object.
+                while (ds.Tables[0].Rows.Count > i)
+                {
+                    xmlStr.AppendFormat("<category label='{0}'/>", ds.Tables[0].Rows[i]["Source_Division_ShortDesc"].ToString());
+                    i++;
+                }
+                i = 0;
+                //Close the `<catgories>` element.
+                xmlStr.AppendFormat("</categories>");
+                while (ds.Tables[1].Rows.Count > i)
+                {
+                    // Append the factory name as the value for the `seriesName` attribute.//Year
+                    xmlStr.AppendFormat("<dataset seriesName='{0}'>", ds.Tables[1].Rows[i]["Year"].ToString());
+                    DataSet ds1 = ProductController.GetDashboardValues_TM(UserID, 3, ds.Tables[1].Rows[i]["Year"].ToString(),"","");
+                    int j = 0;
+                    while (ds1.Tables[0].Rows.Count > j)
+                    {
+                        xmlStr.AppendFormat("<set value='{0}'/>", ds1.Tables[0].Rows[j]["Sales Count"].ToString());
+                        j++;
+                    }
+                    xmlStr.AppendFormat("</dataset>");
+                    i++;
+                }
+                xmlStr.AppendFormat("</chart>");
+                i = 0;
+                Literal4.Text = FusionCharts.RenderChart("FusionCharts/MSCombiDY2D.swf", "", xmlStr.ToString(), "Division_Year_Sales_Analysis", "100%", "500", false, true);
+                            
+            }
+        }
+        catch (Exception ex)
+        {
+        }
+    }
+
+    private void BindChartsforEcommercePortalData()
+    {
+        try
+        {
+            HttpCookie cookie = Request.Cookies.Get("MyCookiesLoginInfo");
+            string UserID = cookie.Values["UserID"];
+            string UserName = cookie.Values["UserName"];
+            DataSet ds = ProductController.GetDashboardValues_ETM(1,"","");
+            if (ds.Tables[0].Rows.Count > 0)
+            {
+                StringBuilder xmlStr = new StringBuilder();
+                xmlStr.Append("<chart caption='E-Commerce' subcaption='Yearly Sales Analysis' palette='3' showalternatehgridcolor='1' alternatehgridcolor='ff5904' divlinecolor='ff5904' divlinealpha='20' alternatehgridalpha='5' canvasbordercolor='666666' canvasborderthickness='1' basefontcolor='666666' linecolor='FF5904' linealpha='85' showvalues='1' rotatevalues='1' valueposition='auto' canvaspadding='8' bgcolor='ffffff' valuepadding='5' showborder='0' xaxisname='Year' yaxisname='Count'> [cceWl lang=’csharp’]");
+                DataTable dt = ds.Tables[0];
+                foreach (DataRow dr in dt.Rows)
+                {
+                    xmlStr.AppendFormat("<set label='{0}' value='{1}' link='{2}'/>", dr["Year"].ToString(), dr["Sales Count"].ToString(), Server.UrlEncode("TM_Dashboard_ECommerce_Drill.aspx?Year=" + dr["Year"].ToString()));
+                }
+                xmlStr.Append("[/cceWl]</chart>");
+                // Set the rendering mode to JavaScript, from the default Flash.
+                FusionCharts.SetRenderer("javascript");
+
+                // Call the RenderChart method, pass the correct parameters, and write the return value to the Literal tag
+                Literal5.Text = FusionCharts.RenderChart("FusionChartsXT/line.swf",  // Path to chart's SWF
+                    "",                             // Page which returns chart data. Leave blank when using Data String.
+                    xmlStr.ToString(),              // String containing the chart data. Leave blank when using Data URL.
+                    "annual_revenue",               // Unique chart ID
+                    "100%", "340",                   // Width & Height of chart
+                    false,                          // Disable Debug Mode
+                    true);                          // Register with JavaScript object
+
+            }   
+        }
+        catch (Exception ex)
+        {
+        }
+
+    }
+
+    private void BindChartsWithEcommerceCategories()
+    {
+        try
+        {
+            HttpCookie cookie = Request.Cookies.Get("MyCookiesLoginInfo");
+            string UserID = cookie.Values["UserID"];
+            string UserName = cookie.Values["UserName"];
+            DataSet ds = ProductController.GetDashboardValues_ETM(4,"","");
+            int i = 0;
+            if ((ds.Tables[0].Rows.Count > 0) && (ds.Tables[1].Rows.Count > 0))
+            {
+                StringBuilder xmlStr = new StringBuilder();
+                // Initialize the chart-level attributes and append them to the
+                //`xmlData` StringBuilder object.
+                //xmlStr.Append("<chart caption='Year Division Wise' subCaption='Sales Analysis' showBorder='1' formatNumberScale='0' rotatelabels='1' showvalues='0' ");
+                xmlStr.Append("<chart caption='E-Commerce' subcaption='Sales Analysis' palette='3' canvasbgalpha='0' bgcolor='#DDDDDD' bgalpha='50' showalternatehgridcolor='1' showvalues='1' bgimage='' bgimagealpha='40' bgimagedisplaymode='stretch' theme='fint' showborder='1' bordercolor='#666666' numberPrefix='' useRoundEdges='1' xaxisname='Year' yaxisname='Count'> [cceWl lang=’csharp’]");
+                // Initialize the `<categories>` element.
+                xmlStr.AppendFormat("<categories>");
+                // Append this data to the `xmlData` object.
+                while (ds.Tables[0].Rows.Count > i)
+                {
+                    xmlStr.AppendFormat("<category label='{0}'/>", ds.Tables[0].Rows[i]["Category"].ToString());
+                    i++;
+                }
+                i = 0;
+                //Close the `<catgories>` element.
+                xmlStr.AppendFormat("</categories>");
+                while (ds.Tables[1].Rows.Count > i)
+                {
+                    // Append the factory name as the value for the `seriesName` attribute.//Year
+                    xmlStr.AppendFormat("<dataset seriesName='{0}'>", ds.Tables[1].Rows[i]["Year"].ToString());
+                    DataSet ds1 = ProductController.GetDashboardValues_ETM(6, ds.Tables[1].Rows[i]["Year"].ToString(),"");
+                    int j = 0;
+                    while (ds1.Tables[0].Rows.Count > j)
+                    {
+                        xmlStr.AppendFormat("<set value='{0}'/>", ds1.Tables[0].Rows[j]["Sales Count"].ToString());
+                        j++;
+                    }
+                    xmlStr.AppendFormat("</dataset>");
+                    i++;
+                }
+                xmlStr.AppendFormat("</chart>");
+                i = 0;
+                Literal6.Text = FusionCharts.RenderChart("FusionCharts/MSCombiDY2D.swf", "", xmlStr.ToString(), "Division_Year_Sales_Analysis", "100%", "500", false, true);
+
+            }
+        }
+        catch (Exception ex)
+        {
+        }
+    }
+}

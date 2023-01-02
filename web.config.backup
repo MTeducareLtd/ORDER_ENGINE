@@ -1,0 +1,63 @@
+﻿<?xml version="1.0"?>
+<!--
+  For more information on how to configure your ASP.NET application, please visit
+  http://go.microsoft.com/fwlink/?LinkId=169433
+  -->
+<configuration>
+  <appSettings>
+    <add key="CONSTR" value="Server=192.168.1.225;Database=DB01_Order_Engine;User Id=sa;Password=MTeducare@1234;"/>
+    <add key="ChartImageHandler" value="storage=file;timeout=1440;dir=c:\TempImageFiles\;"/>
+  </appSettings>
+  <connectionStrings>
+    <add name="strConn" connectionString="Data Source=192.168.1.222;Initial Catalog=DB01_Order_Engine;Persist Security Info=True;User ID=sa;Password=MTeducare@1234" providerName="System.Data.SqlClient"/>
+  </connectionStrings>
+  <system.web>
+    <compilation debug="true" targetFramework="4.0">
+      <assemblies>
+        <add assembly="mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=B77A5C561934E089"/>
+      </assemblies>
+    </compilation>
+    <membership>
+      <providers>
+        <clear/>
+        <add name="AspNetSqlMembershipProvider" type="System.Web.Security.SqlMembershipProvider" connectionStringName="ApplicationServices" enablePasswordRetrieval="false" enablePasswordReset="true" requiresQuestionAndAnswer="false" requiresUniqueEmail="false" maxInvalidPasswordAttempts="5" minRequiredPasswordLength="6" minRequiredNonalphanumericCharacters="0" passwordAttemptWindow="10" applicationName="/"/>
+      </providers>
+    </membership>
+    <profile>
+      <providers>
+        <clear/>
+        <add name="AspNetSqlProfileProvider" type="System.Web.Profile.SqlProfileProvider" connectionStringName="ApplicationServices" applicationName="/"/>
+      </providers>
+    </profile>
+    <roleManager enabled="false">
+      <providers>
+        <clear/>
+        <add name="AspNetSqlRoleProvider" type="System.Web.Security.SqlRoleProvider" connectionStringName="ApplicationServices" applicationName="/"/>
+        <add name="AspNetWindowsTokenRoleProvider" type="System.Web.Security.WindowsTokenRoleProvider" applicationName="/"/>
+      </providers>
+    </roleManager>
+  </system.web>
+  <system.webServer>
+    <modules runAllManagedModulesForAllRequests="true"/>
+  </system.webServer>
+  <system.serviceModel>
+    <bindings>
+      <basicHttpBinding>
+        <binding name="MTEL_ChequeReturnRequestSoap"/>
+        <binding name="LoginServiceSoap"/>
+        <binding name="OE_UserDetailsSoap"/>
+      </basicHttpBinding>
+      <customBinding>
+        <binding name="OE_UserDetailsSoap12">
+          <textMessageEncoding messageVersion="Soap12"/>
+          <httpTransport/>
+        </binding>
+      </customBinding>
+    </bindings>
+    <client>
+      <endpoint address="http://mtelpdc.shvetankinfotech.com/MTEL_ChequeReturnRequest.asmx" binding="basicHttpBinding" bindingConfiguration="MTEL_ChequeReturnRequestSoap" contract="ChequeReturnRequest.MTEL_ChequeReturnRequestSoap" name="MTEL_ChequeReturnRequestSoap"/>
+      <endpoint address="http://192.168.1.225/Web_Ser/LoginService.asmx" binding="basicHttpBinding" bindingConfiguration="LoginServiceSoap" contract="Login_Service.LoginServiceSoap" name="LoginServiceSoap"/>
+      <endpoint address="http://lmsmt.com/WebService_Admin/OE_UserDetails.asmx" binding="basicHttpBinding" bindingConfiguration="OE_UserDetailsSoap" contract="LMS_UserDetails.OE_UserDetailsSoap" name="OE_UserDetailsSoap"/>
+    </client>
+  </system.serviceModel>
+</configuration>

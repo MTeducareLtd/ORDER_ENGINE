@@ -1,0 +1,331 @@
+﻿<%@ Page Language="C#" AutoEventWireup="true" CodeFile="Rcpt_Print1.aspx.cs"  Inherits="Rcpt_Print1" EnableEventValidation ="false" %>
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head id="Head1" runat="server">
+    <title></title>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <meta content="" name="description"/>
+    <meta content="" name="author"/>
+  
+    <script type="text/javascript">
+        window.onload = function () { window.print(); }
+    </script>
+<style>
+
+/* RESET */
+html,body,div,span,applet,object,iframe,h1,h2,h3,h4,h5,h6,p,blockquote,pre,a,abbr,acronym,address,big,cite,code,del,dfn,em,img,ins,kbd,q,s,samp,small,strike,strong,sub,sup,tt,var,b,u,i,center,dl,dt,dd,ol,ul,li,fieldset,form,label,legend,table,caption,tbody,tfoot,thead,tr,th,td,article,aside,canvas,details,embed,figure,figcaption,footer,header,hgroup,menu,nav,output,ruby,section,summary,time,mark,audio,video{border:0;font-size:100%;font:inherit;vertical-align:baseline;margin:0;padding:0}article,aside,details,figcaption,figure,footer,header,hgroup,menu,nav,section{display:block}body{line-height:1}ol,ul{list-style:none}blockquote,q{quotes:none}blockquote:before,blockquote:after,q:before,q:after{content:none}table{border-collapse:collapse;border-spacing:0}
+/* RESET END */
+
+
+@media print {
+
+
+}
+
+.wrapper{
+width: 1000px;
+height: 1290px;
+border: 1px solid black;
+margin: 0 auto;
+
+}
+
+.header{
+width: 100%;
+height: 175px;
+border-bottom: 1px solid black;
+}
+
+.logo{
+float: left;
+width: 17%;
+padding-top: 34px;
+padding-left: 20px;
+}
+
+.header_info{
+float: right;
+width: 80%;
+height: 176px;
+}
+
+.header_info h1{
+font-size: 26px;
+padding-left: 135px;
+padding-top: 15px;
+
+}
+
+.header_info p{
+font-size: 16px;
+padding: 5px 7px 7px 4px;
+
+}
+
+.header_info h2{
+font-size: 20px;
+font-weight: bold;
+text-decoration: underline;
+padding-left: 135px;
+}
+
+.bottom_header{
+border-bottom: 1px solid black;
+padding-bottom: 0px;
+}
+
+.date{
+float: left;
+padding: 10px;
+}
+
+.serial_no{
+float: right;
+padding: 10px;
+}
+
+.user_info{
+padding: 10px;
+}
+
+.user_info h2{
+font-size: 18px;
+padding-bottom: 10px;
+}
+
+.user_info p{
+font-size: 16px;
+border-bottom: 1px solid rgb(186, 186, 186);
+margin-bottom: 5px;
+padding-bottom: 2px;
+}
+
+.table{
+height: 720px;
+border-bottom: 1px solid black;
+}
+
+.left_table{
+width: 580px;
+height: 700px;
+border-right: 1px solid black;
+float: left;
+padding: 10px;
+
+}
+
+.left_table tr{
+border-bottom: 1px solid rgb(205, 205, 205);
+}
+
+.left_table td{
+padding: 1px;
+}
+
+
+
+.right_table{
+width: 372px;
+height: 700px;
+border-left: 1px solid black;
+float: right;
+padding: 10px;
+font-weight: bold;
+}
+
+.right_table tr{
+border-bottom: 1px solid rgb(205, 205, 205);
+}
+
+.right_table td{
+padding: 18px 10px;
+}
+
+.footnote{
+padding: 8px;
+
+}
+
+.footnote h1{
+font-size: 13px;
+padding-bottom: 0px;
+}
+
+.footnote p{
+font-size: 14px;
+line-height: 15px;
+}
+
+.footnote h2{
+font-size: 13px;
+padding-top: 8px;
+}
+
+
+</style>
+</head>
+<body>
+    <form id="form1" runat="server">
+ 
+   
+    <asp:ScriptManager ID="script1" runat="server">
+            </asp:ScriptManager>
+            
+            
+            <asp:UpdatePanel ID="Upnlprintreceipt" runat="server">
+                <ContentTemplate>
+                    <!-- BEGIN RECEIPT I PRINT-->
+                    <asp:Panel ID="pnlPerson" runat="server">
+                        <div class="wrapper">
+                            <div class="header">
+	                            <div class="logo">
+		                             <img id="imglogo" runat ="server"  style="width:100%" />
+		                        </div>
+		                        <div class="header_info">
+		                            <h1> <asp:label ID="Receipt_Head1" runat ="server"></asp:label></h1>
+		                            <p>  <asp:label ID="Receipt_Head2" runat ="server"></asp:label><br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                                         &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                                         <asp:label ID="Receipt_Head3" runat ="server"></asp:label><br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                                         &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                                         &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                                         <asp:label ID="Receipt_Head4" runat ="server"></asp:label><br />
+                                         <asp:label ID="Receipt_Head5" runat ="server"></asp:label></p>
+		                            <h2> <asp:label ID="Receipt_Name" runat ="server"></asp:label></h2>
+		                        </div>
+	
+	                        </div>
+	
+	                        <div class="bottom_header">
+	                            <div class="date">Date: <asp:label ID="Receipt_Date" runat ="server"></asp:label></div>
+	                            <div class="serial_no">Sr.#: <asp:label ID="SBEntrycode" runat ="server"></asp:label></div>
+	
+	                            <div style="clear:both;"></div>
+	
+	                            <div class="user_info">
+	                            <h2>We hereby confirm that we have received the following payments from</h2>
+	                            <p><asp:label ID="lblparentname" runat ="server"></asp:label></p>
+	                            <p>Address: <asp:label ID="lblstudentaddress" runat ="server"></asp:label></p>
+	                            <p>aggregating to Rs. <asp:label ID="lblamountinword" runat ="server"></asp:label></p>
+	                            <p>as tuition fees for <asp:label ID="lblStreamName" runat ="server"></asp:label></p>
+	                            <p>for the academic year <asp:label ID="lblyearname" runat ="server"></asp:label></p>
+	
+	                            </div>
+	                            </div>
+	
+	                        <div class="table">
+	
+		                            <div class="left_table">
+		                                <asp:Repeater ID="Repeater1" runat="server">
+                                                <HeaderTemplate>
+                                                    <table style="width:100%;border:none;font-size:13px">
+                                                        <tr>
+                                                                <td>Date</td>
+                                                                <td>Receipt No</td>
+                                                                <td>Amount</td>
+                                                                <td>Instr No</td>
+                                                                <td>Bank/Branch</td>
+                                                        </tr>
+                                                      
+                                                        <tbody>
+                                                    </HeaderTemplate>
+                                                    <ItemTemplate>
+                                                        <tr>
+                                                            <td>
+                                                                <asp:Label ID="Label1" Text='<%#DataBinder.Eval(Container.DataItem, "Receipt_Date")%>'
+                                                                    runat="server"></asp:Label>
+                                                            </td>
+                                                            <td>
+                                                                <asp:Label ID="Label2" Text='<%#DataBinder.Eval(Container.DataItem, "Receipt_Num")%>'
+                                                                    runat="server"></asp:Label>
+                                                            </td>
+                                                            <td>
+                                                                <asp:Label ID="Label3" Text='<%#DataBinder.Eval(Container.DataItem, "Receipt_amt")%>'
+                                                                    runat="server"></asp:Label>
+                                                            </td>
+                                                            <td>
+                                                                <asp:Label ID="Label4" Text='<%#DataBinder.Eval(Container.DataItem, "Instrument_No")%>'
+                                                                    runat="server"></asp:Label>
+                                                            </td>
+                                                            <td>
+                                                                <asp:Label ID="Label5" Text='<%#DataBinder.Eval(Container.DataItem, "Bank_Name")%>'
+                                                                    runat="server"></asp:Label>
+                                                            </td>
+                                                        </tr>
+                                                    </ItemTemplate>
+                                                    <FooterTemplate>
+                                                        </tbody> 
+                                                    </table>
+                                                </FooterTemplate>
+                                             </asp:Repeater>
+			                        </div>
+		
+		                <div class="right_table">
+
+                            <asp:Repeater ID="Repeater2" runat="server">
+                                                <HeaderTemplate>
+                                                    <table style="width:100%;border:none;">
+                                                            <tr>
+					                                            <td colspan="2" style="text-align:center;padding: 0;"> TOTAL </td>
+				                                            </tr>
+                                                           <%-- <tr>
+                                                                 <td>Fees Head</td>
+                                                                 <td>Amount</td>
+                                                            </tr>--%>
+                                                       
+                                                        
+                                                    </HeaderTemplate>
+                                                    <ItemTemplate>
+                                                        <tr>
+                                                            <td>
+                                                                <asp:Label ID="Label1" Text='<%#DataBinder.Eval(Container.DataItem, "Field")%>'
+                                                                    runat="server"></asp:Label>
+                                                            </td>
+                                                            <td style="text-align: right;border-left: 1px solid rgb(205, 205, 205);">
+                                                                <asp:Label ID="Label2" Text='<%#DataBinder.Eval(Container.DataItem, "Grossfees")%>'
+                                                                    runat="server"></asp:Label>
+                                                            </td>
+                                                        </tr>
+                                                    </ItemTemplate>
+                                                    <FooterTemplate>
+                                                        
+                                                    </table>
+                                                </FooterTemplate>
+                                             </asp:Repeater>
+		                            </div>
+	                        </div>
+
+	                        <div class="footnote">
+                                <div style="float:left;">
+	                            <h2>Notes :</h2>
+	                            <p>* Fees includes amount payable towards coaching, robomate, bags, T-shirt, study materials and other supplies.<br />
+                                   * Fees once paid will be refundable only at sole discretion of management<br />
+                                   * This receipt is subject to realisation of cheques.<br />
+                                   * In case of cheque being dishonoured, a penalty of Rs. 200/­ will be levied for every default.<br /> 
+                                   * The Company reserves the right to take legal action against any dishonoured cheque.</p><br />
+	                            <h1>Service Tax Regn. No.: <asp:Label ID="lblservicetaxregno"  runat ="server"></asp:Label></h1>
+                                <h1>GST No: <asp:Label ID="lblgstno"  runat ="server"></asp:Label></h1>
+                                <h1>State: <asp:Label ID="lblgststate"  runat ="server"></asp:Label></h1>
+                                </div>
+                                <div style="float: right;margin-right: 112px;">
+                                    <h1>Receivers Signature</h1>
+                                </div>
+	                        </div>
+                            
+                            
+                        </div>
+                  
+                    
+                    </asp:Panel>
+                    <asp:Button ID="btnprint" runat ="server" OnClick ="btnprint_Click" Text="Print" Visible ="false"  />
+                </ContentTemplate>
+               
+            </asp:UpdatePanel>
+      
+    </form>
+</body>
+</html>
+
+

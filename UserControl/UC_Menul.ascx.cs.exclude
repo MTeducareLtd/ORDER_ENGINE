@@ -1,0 +1,84 @@
+﻿using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.Data;
+using System.Diagnostics;
+using System.Data.SqlClient;
+using System.Configuration;
+using System.Web;
+using System.Web.Security;
+using System.Web.UI;
+using System.Web.UI.WebControls;
+using System.Web.UI.WebControls.WebParts;
+using System.Web.UI.HtmlControls;
+using System.IO;
+using ShoppingCart.BL;
+partial class UserControl_UC_Menul : System.Web.UI.UserControl
+{
+
+    protected void Page_Load(object sender, System.EventArgs e)
+    {
+        if (!IsPostBack)
+        {
+            string Userid = "";
+            string Username = "";
+            HttpCookie cookie = Request.Cookies.Get("MyCookiesLoginInfo");
+            if (Request.Cookies["MyCookiesLoginInfo"] != null)
+            {
+                Userid = cookie.Values["UserID"];
+                Username = cookie.Values["UserName"];
+                MenuGeneration();
+            }
+            else
+            {
+                Response.Redirect("login.aspx");
+            }
+        }
+    }
+
+    private void MenuGeneration()
+    {
+        //HttpCookie cookie = Request.Cookies.Get("MyCookiesLoginInfo");
+        //if (Request.Cookies["MyCookiesLoginInfo"] != null)
+        //{
+        //    string Userid = cookie.Values["UserID"];
+        //    string lstr = "";
+        //    lstr = Convert.ToString(("<ul class='page-sidebar-menu'> <li class='sidebar-toggler-wrapper'><div class='sidebar-toggler hidden-phone'></div> </li><br/>"));
+        //    DataSet ds = ProductController.GetMenu(1, Userid);
+        //    for (int i = 0; i <= ds.Tables[0].Rows.Count - 1; i++)
+        //    {
+        //        lstr += Convert.ToString(("<li class=''> <a href=' " + ds.Tables[0].Rows[i]["Menu_link"] + "'><i class='" + ds.Tables[0].Rows[i]["Menu_CSS"] + "'></i><span class='title'>"));
+        //        lstr += (Convert.ToString(ds.Tables[0].Rows[i]["Menu_Name"]));
+        //        DataSet ds1 = ProductController.Get_Menu_Items(2, Convert.ToInt32(ds.Tables[0].Rows[i]["Menu_ID"].ToString()), Userid);
+        //        if (ds1.Tables[0].Rows.Count > 0)
+        //        {
+        //            lstr += Convert.ToString(("</span><span class='arrow'></span><b></b>"));
+        //            lstr += Convert.ToString(("</a><ul class='sub-menu'>"));
+        //            for (int j = 0; j <= ds1.Tables[0].Rows.Count - 1; j++)
+        //            {
+        //                lstr += Convert.ToString((((" <li class='" + ds1.Tables[0].Rows[j]["Menu_Css"] + "' ><a href='") + ds1.Tables[0].Rows[j]["Menu_Link"] + "'><i></i>") + ds1.Tables[0].Rows[j]["Menu_Name"] + "</a>"));
+        //                //Dim ds2 As DataSet = ProductController.Get_Menu_Items(3, Convert.ToInt32(ds1.Tables(0).Rows(i)("Menu_ID").ToString()), Userid)
+        //                //If ds2.Tables(0).Rows.Count > 0 Then
+        //                //    lstr += Convert.ToString(("<ul class='sub_main'>"))
+        //                //    For k As Integer = 0 To ds2.Tables(0).Rows.Count - 1
+        //                //        lstr += Convert.ToString(("<li><a href='" + ds2.Tables(0).Rows(k)("Menu_Link") + "'><i class='icon-cog' ></i>" + ds2.Tables(0).Rows(k)("Menu_Name") & " </a></li>"))
+        //                //    Next
+        //                //    lstr += Convert.ToString(("</ul></li>"))
+        //                //End If
+        //            }
+        //            lstr += Convert.ToString(("</ul></li>"));
+        //        }
+        //        lstr += Convert.ToString(("</span></a></li>"));
+        //        lblHeaderMenu.Text = lstr;
+        //    }
+        //    lstr += Convert.ToString(("</ul>"));
+
+        //}
+
+    }
+    
+    public UserControl_UC_Menul()
+    {
+        Load += Page_Load;
+    }
+}

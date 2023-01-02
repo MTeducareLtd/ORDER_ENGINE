@@ -1,0 +1,1870 @@
+﻿using System.Collections;
+using System.Data;
+using System.Diagnostics;
+using System.Data.SqlClient;
+using System.Configuration;
+using System.Web;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Web;
+using System.Web.UI;
+using System.Web.UI.WebControls;
+using System.Web.UI.HtmlControls;
+using System.Data;
+using iTextSharp.text;
+using iTextSharp.text.pdf;
+using iTextSharp.text.html;
+using iTextSharp.text.html.simpleparser;
+using System.IO;
+using System.util;
+using System.Text.RegularExpressions;
+using ShoppingCart.BL;
+
+
+public partial class Rcpt_Print1 : System.Web.UI.Page
+{
+    protected void Page_Load(object sender, EventArgs e)
+    {
+        if (!IsPostBack)
+        {
+            //string Menuid = "117";
+            if (Request.Cookies["MyCookiesLoginInfo"] != null)
+            {
+                HttpCookie cookie = Request.Cookies.Get("MyCookiesLoginInfo");
+                string UserID = cookie.Values["UserID"];
+                string UserName = cookie.Values["UserName"];
+               
+                
+                //string UserCompany = "";
+                //SqlDataReader dr1 = UserController.GetCompanyby_Userid(UserID);
+                //try
+                //{
+                //    if ((((dr1) != null)))
+                //    {
+                //        if (dr1.Read())
+                //        {
+                //            UserCompany = dr1["Company_Code"].ToString();
+                //        }
+                //    }
+
+                //}
+                //catch (Exception ex)
+                //{
+                //}
+                //lblusercompany.Text = UserCompany;
+                //Dim SBEntrycode As String = Encryption_Decryption.decryptQueryString(Request.QueryString("SB"))
+                string SBECode = null;
+                SBECode = Request.QueryString["SBECode"]; // Encryption_Decryption.decryptQueryString(Request.QueryString["SBECode"]);
+                //SBECode = "OE0032015000001";
+                string PPCode = null;
+                PPCode = Request.QueryString["PPCode"]; // Encryption_Decryption.decryptQueryString(Request.QueryString["PPCode"]);
+                //PPCode = "PP011";
+                string[] SPECodeSplit = null;
+                SPECodeSplit = SBECode.Split(',');
+                int SBECount = 0;
+                SBECount = GetSubstringCount(SBECode, ",", false);
+                int cnt = 0;
+                string FinalOutputStr = "";
+                for (cnt = 0; cnt <= SBECount; cnt++)
+                {
+                    if (PPCode == "PP001")
+                    {
+                        FinalOutputStr = FinalOutputStr + FillReceipt(SPECodeSplit[cnt], PPCode, 1);
+                        FinalOutputStr = FinalOutputStr + FillReceipt(SPECodeSplit[cnt], PPCode, 2);
+                        FinalOutputStr = FinalOutputStr + FillReceipt(SPECodeSplit[cnt], PPCode, 3);
+                        
+                    }
+                    else
+                    {
+                        //FinalOutputStr = FinalOutputStr + FillReceipt(SPECodeSplit[cnt], PPCode, 1);
+                        DataSet ds = ProductController_Report.GetStudentPrintReceipt(SPECodeSplit[cnt], PPCode, 1);
+                        imglogo .Src = ds.Tables[3].Rows[0]["ReceiptLogoImagePath"].ToString();
+                        Receipt_Head1.Text = ds.Tables[3].Rows[0]["Receipt_Head1"].ToString();
+                        Receipt_Head2.Text = ds.Tables[3].Rows[0]["Receipt_Head2"].ToString();
+                        Receipt_Head3.Text = ds.Tables[3].Rows[0]["Receipt_Head3"].ToString();
+                        Receipt_Head4.Text = ds.Tables[3].Rows[0]["Receipt_Head4"].ToString();
+                        Receipt_Head5.Text = ds.Tables[3].Rows[0]["Receipt_Head5"].ToString();
+                        lblservicetaxregno.Text = ds.Tables[3].Rows[0]["ServiceTaxRegNo"].ToString();
+                        Receipt_Name.Text = ds.Tables[3].Rows[0]["Receipt_Name"].ToString();
+                        Receipt_Date.Text = ds.Tables[2].Rows[0]["ReceiptDate"].ToString();
+                        SBEntrycode.Text = ds.Tables[2].Rows[0]["sbentrycode"].ToString();
+                        lblparentname.Text = ds.Tables[2].Rows[0][0].ToString();
+                        lblstudentaddress.Text = ds.Tables[2].Rows[0]["StudentAddress"].ToString();
+                        lblamountinword.Text = ds.Tables[6].Rows[0]["AmountinWords"].ToString();
+                        lblStreamName.Text = ds.Tables[2].Rows[0]["StreamName"].ToString();
+                        lblyearname.Text = ds.Tables[2].Rows[0]["YearName"].ToString();
+                        lblgstno.Text = ds.Tables[3].Rows[0]["GST_No"].ToString();
+                        lblgststate.Text = ds.Tables[3].Rows[0]["GST_State"].ToString();
+                        if (ds.Tables[0].Rows.Count > 0)
+                        {
+                            Repeater1.DataSource = ds;
+                            Repeater1.DataBind();
+                        }
+
+                        if (ds.Tables[5].Rows.Count > 0)
+                        {
+                            Repeater2.DataSource = ds.Tables[5];
+                            Repeater2.DataBind();
+                        }
+                        //BindPayment(SPECodeSplit[cnt], PPCode, 1);
+                    }
+                }
+               
+            }
+            else
+            {
+                Response.Redirect("login.aspx");
+            }
+         }
+    }
+
+    private void BindPayment(string Sbentrycode,string ppcode, int Flag)
+    {
+        DataSet ds = ProductController_Report.GetStudentPrintReceipt(Sbentrycode, ppcode, 1);
+        if (ds.Tables[0].Rows.Count > 0)
+        {
+            Repeater1.DataSource = ds;
+            Repeater1.DataBind();
+        }
+
+        if (ds.Tables[5].Rows.Count > 0)
+        {
+            Repeater2.DataSource = ds.Tables[5];
+            Repeater2.DataBind();
+        }
+
+    }
+  
+    
+    public int GetSubstringCount(string strToSearch, string strToLookFor, bool bolCaseSensative)
+    {
+        int functionReturnValue = 0;
+        if (bolCaseSensative)
+        {
+            functionReturnValue = strToSearch.Split(',').GetUpperBound(0);
+        }
+        else
+        {
+            functionReturnValue = strToSearch.ToUpper().Split(',').GetUpperBound(0);
+        }
+        return functionReturnValue;
+    }
+
+    private string FillReceipt(string Cur_Sb_Code, string PPCode, int Flag)
+    {
+        string OutputStr = "";
+        double TotalAmt = 0;
+
+        DataSet ds = ProductController_Report.GetStudentPrintReceipt(Cur_Sb_Code, PPCode, Flag);
+        try
+        {
+
+            if (PPCode == "PP011")
+            {
+                //adp1.Fill(ds, "Receipt")
+                OutputStr = OutputStr + "<div class=widget-box invoice-box' style='border: 1px solid black; padding: 2px'>";
+                OutputStr = OutputStr + "<div class='row-fluid'>";
+
+                OutputStr = OutputStr + "<div class='span12>";
+                OutputStr = OutputStr + "<div class='span1' align='left'>";
+                //OutputStr = OutputStr + "";
+                // />"
+                //OutputStr = OutputStr + "<img src=" + ds.Tables[3].Rows[0]["ReceiptLogoImagePath"].ToString() + " width ='300px' height ='83px'/>";
+                //OutputStr = OutputStr + "<img src='Browse/Company_Logo/logo.jpg' width ='90px' height ='25px'/>";
+                OutputStr = OutputStr + "</div>";
+
+                //OutputStr = OutputStr & "<div class='row-fluid'>"
+                OutputStr = OutputStr + "<div class='span11' align ='center'>";
+                OutputStr = OutputStr + "<strong ><h4>" + ds.Tables[3].Rows[0]["Receipt_Head1"].ToString() + "</strong></h4>";
+                OutputStr = OutputStr + "<small>" + ds.Tables[3].Rows[0]["Receipt_Head2"].ToString() + "</br>";
+                OutputStr = OutputStr + "" + ds.Tables[3].Rows[0]["Receipt_Head3"].ToString() + "</br>";
+                OutputStr = OutputStr + "" + ds.Tables[3].Rows[0]["Receipt_Head4"].ToString() + "</br>";
+                OutputStr = OutputStr + "" + ds.Tables[3].Rows[0]["Receipt_Head5"].ToString() + "</small></div>";
+                //OutputStr = OutputStr & "<div class='span3'><p><span class='muted'></span></p></div>"
+                OutputStr = OutputStr + "</div>";
+                //OutputStr = OutputStr + "</div>";
+
+                OutputStr = OutputStr + "<div class='widget-body'><div class='widget-main padding-24'>";
+                OutputStr = OutputStr + "<div class='row-fluid'>";
+                OutputStr = OutputStr + "<div class='span12'>";
+                OutputStr = OutputStr + "<h5 align ='center'><strong>" + ds.Tables[3].Rows[0]["Receipt_Name"].ToString() + "</strong></h5>";
+                OutputStr = OutputStr + "</div>";
+                OutputStr = OutputStr + "</div>";
+
+                OutputStr = OutputStr + "<div class='row-fluid'>";
+                OutputStr = OutputStr + "<div class='span6'>";
+                OutputStr = OutputStr + "<h6 align ='left'>Date: <strong>" + ds.Tables[2].Rows[0]["ReceiptDate"].ToString() + "</strong></h6>";
+                OutputStr = OutputStr + "</div>";
+                OutputStr = OutputStr + "<div class='span6'>";
+                OutputStr = OutputStr + "<h6 align ='right'>Sr. No.<strong>" + ds.Tables[2].Rows[0]["sbentrycode"].ToString() + "</strong></h6>";
+                OutputStr = OutputStr + "</div>";
+                OutputStr = OutputStr + "</div>";
+
+                OutputStr = OutputStr + "<div class='row-fluid'>";
+                OutputStr = OutputStr + "<div class='span12'>";
+
+                OutputStr = OutputStr + "We hereby confirm that we have received the following payments from";
+                OutputStr = OutputStr + "<strong>" + ds.Tables[2].Rows[0][0].ToString() + "</strong>&nbsp;<br>";
+                OutputStr = OutputStr + "Address : <strong>" + ds.Tables[2].Rows[0]["StudentAddress"].ToString() + "</strong><br>";
+                OutputStr = OutputStr + "aggregating to Rs. <strong>" + ds.Tables[1].Rows[0]["Tot_Voucher_amt_inword"].ToString() + "</strong>&nbsp;&nbsp;";
+                OutputStr = OutputStr + "as tuition fees for <strong>" + ds.Tables[2].Rows[0]["StreamName"].ToString() + "</strong>&nbsp;&nbsp;";
+                OutputStr = OutputStr + "for the academic year <strong>" + ds.Tables[2].Rows[0]["YearName"].ToString() + "</strong></br>";
+                OutputStr = OutputStr + "</div></div></div>";
+
+
+                OutputStr = OutputStr + "<div class='row-fluid' style='height:10%'>";
+                OutputStr = OutputStr + "<div class='span8'>";
+
+                int RCnt = 0;
+                OutputStr = OutputStr + "<table class='table-striped table-bordered' border='1' width='100%' cellpadding='5px' >";
+
+                OutputStr = OutputStr + "<tr>";
+                OutputStr = OutputStr + "<td width='20%'><b>Date</b></td>";
+                OutputStr = OutputStr + "<td width='15%'><b>Receipt No</b></td>";
+                OutputStr = OutputStr + "<td width='15%' align ='right'><b>Amount</b></td>";
+                OutputStr = OutputStr + "<td width='15%'><b>Instr No</b></td>";
+                OutputStr = OutputStr + "<td width='40%'><b>Bank/Branch</b></td>";
+                OutputStr = OutputStr + "</tr>";
+
+                while (RCnt <= int.Parse(ds.Tables[0].Rows.Count.ToString()) - 1)
+                {
+                    OutputStr = OutputStr + "<tr>";
+                    OutputStr = OutputStr + "<td width='20%'>" + ds.Tables[0].Rows[RCnt]["Receipt_Date"].ToString() + "</td>";
+                    OutputStr = OutputStr + "<td width='15%'>" + ds.Tables[0].Rows[RCnt]["Receipt_Num"].ToString() + "</td>";
+                    OutputStr = OutputStr + "<td width='15%' align ='right'>" + ds.Tables[0].Rows[RCnt]["Receipt_amt"].ToString() + "</td>";
+                    OutputStr = OutputStr + "<td width='15%' >" + ds.Tables[0].Rows[RCnt]["Instrument_No"].ToString() + "</td>";
+                    OutputStr = OutputStr + "<td width='40%' >" + ds.Tables[0].Rows[RCnt]["Bank_Name"].ToString() + "</td>";
+                    OutputStr = OutputStr + "</tr>";
+
+
+                    //TotalAmt = TotalAmt + Convert.ToInt32((ds.Tables[0].Rows[RCnt]["Receipt_amt"].ToString()));
+                    RCnt = RCnt + 1;
+                }
+
+                OutputStr = OutputStr + "</table>";
+
+                OutputStr = OutputStr + "</div>";
+
+                OutputStr = OutputStr + "<div class='span4'>";
+                //OutputStr = OutputStr + "Fees Breakup will come here";
+                int RCnt1 = 0;
+                OutputStr = OutputStr + "<table class='table-striped table-bordered' border='1' width='100%' cellpadding=2px style='height:Auto'>";
+
+                OutputStr = OutputStr + "<tr>";
+                OutputStr = OutputStr + "<td width='55%'><b>Fees Head</b></td>";
+                OutputStr = OutputStr + "<td width='45%'><b>Amount</b></td>";
+                while (RCnt1 <= int.Parse(ds.Tables[5].Rows.Count.ToString()) - 1)
+                {
+                    OutputStr = OutputStr + "<tr>";
+                    OutputStr = OutputStr + "<td width='55%'>" + ds.Tables[5].Rows[RCnt1]["Field"].ToString() + "</td>";
+                    OutputStr = OutputStr + "<td width='45%' align ='right'>" + ds.Tables[5].Rows[RCnt1]["Grossfees"].ToString() + "</td>";
+                    OutputStr = OutputStr + "</tr>";
+                    //TotalAmt = TotalAmt + Convert.ToInt32((ds.Tables[0].Rows[RCnt]["Receipt_amt"].ToString()));
+                    RCnt1 = RCnt1 + 1;
+                }
+                OutputStr = OutputStr + "</tr>";
+                OutputStr = OutputStr + "</table>";
+                OutputStr = OutputStr + "</div>";
+                OutputStr = OutputStr + "</div>";
+
+                OutputStr = OutputStr + "<div class='row-fluid'>";
+                OutputStr = OutputStr + "<div class='span9'>";
+
+                OutputStr = OutputStr + "<h6 align ='left'>Notes :</h6>";
+                OutputStr = OutputStr + "<ul class='list-unstyled'>";
+                OutputStr = OutputStr + "<li><small>Fees once paid will neither be adjusted nor refunded under any circumstances.</small></li>";
+                OutputStr = OutputStr + "<li><small>This receipt is subject to realisation of cheques</small></li>";
+                OutputStr = OutputStr + "<li><small>In case of cheque being dishonoured, a penalty of Rs. 200/- will be levied for every default.</small></li>";
+                OutputStr = OutputStr + "<li><small>The Institute reserves the right to take legal action against any dishonoured cheque.</small></li>";
+                OutputStr = OutputStr + "</ul>";
+                OutputStr = OutputStr + "<h6 align ='left'>Service Tax Regn. No.: <strong>ST001</strong></h6>";
+                OutputStr = OutputStr + "</div>";
+                OutputStr = OutputStr + "<div class='span3'>";
+                OutputStr = OutputStr + "<br/><br/><br/><br/><br/><br/>";
+                OutputStr = OutputStr + "<strong>Receiver's Signature</strong>";
+                OutputStr = OutputStr + "</div>";
+                OutputStr = OutputStr + "</div>";
+                ////OutputStr = OutputStr + "<br/><br/><h1></h1>";
+                ////if (Amtinwords < 1)
+                ////{
+                ////    OutputStr = "";
+                ////}
+                OutputStr = OutputStr + "</div>"; //widget body
+                OutputStr = OutputStr + "</div>"; //widget main
+                OutputStr = OutputStr + "</div>"; //widget
+
+            }
+            else
+            {
+
+                //adp1.Fill(ds, "Receipt")
+                OutputStr = OutputStr + "<div class='invoice'>";
+                OutputStr = OutputStr + "<div class='row invoice-logo'>";
+                if (PPCode == "PP001")
+                {
+                    OutputStr = OutputStr + "<div class='span2 invoice-logo-space'>";
+                    //OutputStr = OutputStr + "<img src='" + ds.Tables[3].Rows[0]["ReceiptLogoImagePath"].ToString() + "' />";
+                    //OutputStr = OutputStr & "<img src=" & ds.Tables(3).Rows(0).Item("ReceiptLogoImagePath").ToString & " width ='300px' height ='83px'/>"
+                    OutputStr = OutputStr + "</div>";
+                }
+                else
+                {
+                    OutputStr = OutputStr + "<div class='span2 invoice-logo-space'>";
+                    OutputStr = OutputStr + "";
+                    // />"
+                    //OutputStr = OutputStr & "<img src=" & ds.Tables(3).Rows(0).Item("ReceiptLogoImagePath").ToString & " width ='300px' height ='83px'/>"
+                    OutputStr = OutputStr + "</div>";
+                }
+                //OutputStr = OutputStr & "<div class='row-fluid'>"
+                OutputStr = OutputStr + "<div class='span8' align='center'>";
+                OutputStr = OutputStr + "<h3><strong >" + ds.Tables[3].Rows[0]["Receipt_Head1"].ToString() + "</strong></h3>";
+                OutputStr = OutputStr + "<h4><strong >" + ds.Tables[3].Rows[0]["Receipt_Head2"].ToString() + "</strong></h4>";
+                OutputStr = OutputStr + "<h5><strong >" + ds.Tables[3].Rows[0]["Receipt_Head3"].ToString() + "</strong></h5></div>";
+                //OutputStr = OutputStr & "<div class='span3'><p><span class='muted'></span></p></div>"
+                OutputStr = OutputStr + "</div>";
+                //OutputStr = OutputStr & "</div>"
+                OutputStr = OutputStr + "<div class='row-fluid'>";
+                OutputStr = OutputStr + "<div class='span12'>";
+                OutputStr = OutputStr + "<h4 align ='center'><strong>" + ds.Tables[3].Rows[0]["Receipt_Name"].ToString() + "</strong></h4>";
+                OutputStr = OutputStr + "</div>";
+                OutputStr = OutputStr + "</div>";
+
+                OutputStr = OutputStr + "<div class='row-fluid'>";
+                OutputStr = OutputStr + "<div class='span6'>";
+                //OutputStr = OutputStr & "Student Name"
+                OutputStr = OutputStr + "<ul class='list-unstyled'>";
+                OutputStr = OutputStr + "<li>Student Name: <strong>" + ds.Tables[2].Rows[0][0].ToString() + "</strong></li>";
+                OutputStr = OutputStr + "<li>Class: <strong>" + ds.Tables[2].Rows[0]["StreamName"].ToString() + "</strong></li>";
+                OutputStr = OutputStr + "<li>Academic Year: <strong>" + ds.Tables[2].Rows[0]["YearName"].ToString() + "</strong></li>";
+                if (ds.Tables[4].Rows.Count > 0)
+                {
+                    OutputStr = OutputStr + "<li>Specialisation: <strong>" + ds.Tables[4].Rows[0]["Specialisation"].ToString() + "</strong></li>";
+                }
+                else
+                {
+                }
+                OutputStr = OutputStr + "<li>Student Code: <strong>" + ds.Tables[2].Rows[0]["sbentrycode"].ToString() + "</strong></li></ul></div>";
+
+
+
+                OutputStr = OutputStr + "<div class='span6 invoice-payment' align='right'>";
+                //OutputStr = OutputStr & "<h4></h4>"
+                OutputStr = OutputStr + "<ul class='list-unstyled'>";
+                OutputStr = OutputStr + "<li>Receipt date: <strong>" + ds.Tables[2].Rows[0]["ReceiptDate"].ToString() + "</strong></li>";
+                OutputStr = OutputStr + "<li>Receipt no: <strong>" + ds.Tables[0].Rows[0]["Receipt_Num"].ToString() + "</strong></li>";
+                OutputStr = OutputStr + "<li><strong>" + " " + "</strong></li>";
+                OutputStr = OutputStr + "<li><strong>" + " " + "</strong></li>";
+                OutputStr = OutputStr + "<li><strong>" + " " + "</strong></li>";
+                OutputStr = OutputStr + "</ul>";
+                OutputStr = OutputStr + "</div></div>";
+
+                OutputStr = OutputStr + "<div class='row-fluid'>";
+                OutputStr = OutputStr + "<div class='span12'>";
+
+                int RCnt = 0;
+                OutputStr = OutputStr + "<table cellspacing='3px' cellpadding='3px'  border='1' width='100%'>";
+                //class='table table-striped table-bordered'
+                OutputStr = OutputStr + "<tr>";
+                OutputStr = OutputStr + "<td width='10%'><b>Sr. No.</b></td>";
+                OutputStr = OutputStr + "<td width='80%'><b>Description</b></td>";
+                OutputStr = OutputStr + "<td width='10%' align ='right'><b>Amount</b></td>";
+                OutputStr = OutputStr + "</tr>";
+
+                while (RCnt <= int.Parse(ds.Tables[0].Rows.Count.ToString()) - 1)
+                {
+                    OutputStr = OutputStr + "<tr>";
+                    OutputStr = OutputStr + "<td width='10%'>" + ds.Tables[0].Rows[RCnt][0].ToString() + "</td>";
+                    OutputStr = OutputStr + "<td width='80%'>" + ds.Tables[0].Rows[RCnt][1].ToString() + "</td>";
+                    OutputStr = OutputStr + "<td width='10%' align ='right'>" + ds.Tables[0].Rows[RCnt][2].ToString() + "</td>";
+                    OutputStr = OutputStr + "</tr>";
+
+
+                    TotalAmt = TotalAmt + Convert.ToInt32((ds.Tables[0].Rows[RCnt][2].ToString()));
+                    RCnt = RCnt + 1;
+                }
+
+                decimal Amtinwords = decimal.Parse(ds.Tables[1].Rows[0][0].ToString());
+
+                decimal a1 = Amtinwords;
+                string Inwords = "Rupees" + " " + GetInWords(a1);
+
+                OutputStr = OutputStr + "<tr>";
+                OutputStr = OutputStr + "<td colspan ='2' width='70%'><b>Amount in words:</b> " + Inwords + "</td>";
+                OutputStr = OutputStr + "<td width='20%' align ='right'><b>" + ds.Tables[1].Rows[0][1].ToString() + "</b></td>";
+                OutputStr = OutputStr + "</tr>";
+                OutputStr = OutputStr + "</table>";
+
+                OutputStr = OutputStr + "</div>";
+                OutputStr = OutputStr + "</div>";
+
+                OutputStr = OutputStr + "<div class='row-fluid'>";
+                OutputStr = OutputStr + "<div class='span7'>";
+                OutputStr = OutputStr + "<div><br/><br/>";
+                OutputStr = OutputStr + "<strong>Authorised Signatory</strong>";
+                OutputStr = OutputStr + "</div></div>";
+                OutputStr = OutputStr + "</div></div>";
+                OutputStr = OutputStr + "<br/><br/><h1></h1>";
+                if (Amtinwords < 1)
+                {
+                    OutputStr = "";
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            OutputStr = "";
+
+        }
+
+        return OutputStr;
+
+    }
+
+    public string GetInWords(decimal num)
+    {
+        // ERROR: Not supported in C#: OnErrorStatement
+
+        string str = null;
+        long subnum = 0;
+        TextBox Digits = new TextBox();
+        str = "";
+        Digits.Text = num.ToString();
+        if (Digits.Text.Length > 11)
+        {
+            str = GetSubInWords(Convert.ToInt64(Digits.Text.Substring(1, Digits.Text.Length - 9)));
+
+            Digits.Text = Digits.Text.Substring(Digits.Text.Length - 9 + 1, 9);
+
+        }
+
+        if (Digits.Text.Length == 11)
+        {
+            subnum = Convert.ToInt64(Digits.Text.Substring(1, 2));
+
+            if (subnum >= 20)
+            {
+                str = str + GetTwenty(subnum / 10);
+
+                str = str + " " + GetTens(subnum % 10);
+                str = str + " Billion ";
+            }
+            else if (subnum > 0)
+            {
+                str += GetTens(subnum);
+                str += " Billion ";
+            }
+            subnum = Convert.ToInt64(Digits.Text.Substring(3, 2));
+
+            if (subnum >= 20)
+            {
+                str = str + GetTwenty(subnum / 10);
+
+                str = str + " " + GetTens(subnum % 10);
+                str = str + " Crores ";
+            }
+            else if (subnum > 0)
+            {
+                str += GetTens(subnum);
+                str += " Crores ";
+            }
+            subnum = Convert.ToInt64(Digits.Text.Substring(5, 2));
+
+            if (subnum >= 20)
+            {
+                str = str + GetTwenty(subnum / 10);
+
+                str = str + " " + GetTens(subnum % 10);
+                str = str + " Lakhs ";
+            }
+            else if (subnum > 0)
+            {
+                str += GetTens(subnum);
+                str += " Lakhs ";
+            }
+
+            subnum = Convert.ToInt64(Digits.Text.Substring(7, 2));
+
+            if (subnum >= 20)
+            {
+                str = str + GetTwenty(subnum / 10);
+                str = str + " " + GetTens(subnum % 10);
+                str = str + " Thousand ";
+            }
+            else if (subnum > 0)
+            {
+                str += GetTens(subnum);
+                str += " Thousand ";
+            }
+
+            subnum = Convert.ToInt64(Digits.Text.Substring(9, 1));
+            if (subnum >= 20)
+            {
+                str = str + GetTwenty(subnum / 10);
+                str = str + " " + GetTens(subnum % 10);
+                str = str + " Hundred ";
+            }
+            else if (subnum > 0)
+            {
+                str += GetTens(subnum);
+                str += " Hundred ";
+            }
+
+            subnum = Convert.ToInt64(Digits.Text.Substring(10, 2));
+
+            if (subnum >= 20)
+            {
+                str = str + GetTwenty(subnum / 10);
+                str = str + " " + GetTens(subnum % 10);
+                //str = str + " Rupees only "
+            }
+            else if (subnum > 0)
+            {
+                str += GetTens(subnum);
+                //str += " Rupees only "
+            }
+            str = str + " only ";
+        }
+        if (Digits.Text.Length == 10)
+        {
+            subnum = Convert.ToInt64(Digits.Text.Substring(1, 1));
+
+            if (subnum >= 20)
+            {
+                str = str + GetTwenty(subnum / 10);
+
+                str = str + " " + GetTens(subnum % 10);
+                str = str + " Billion ";
+            }
+            else if (subnum > 0)
+            {
+                str += GetTens(subnum);
+                str += " Billion ";
+            }
+            subnum = Convert.ToInt64(Digits.Text.Substring(2, 2));
+
+            if (subnum >= 20)
+            {
+                str = str + GetTwenty(subnum / 10);
+
+                str = str + " " + GetTens(subnum % 10);
+                str = str + " Crores ";
+            }
+            else if (subnum > 0)
+            {
+                str += GetTens(subnum);
+                str += " Crores ";
+            }
+            subnum = Convert.ToInt64(Digits.Text.Substring(4, 2));
+
+            if (subnum >= 20)
+            {
+                str = str + GetTwenty(subnum / 10);
+
+                str = str + " " + GetTens(subnum % 10);
+                str = str + " Lakhs ";
+            }
+            else if (subnum > 0)
+            {
+                str += GetTens(subnum);
+                str += " Lakhs ";
+            }
+
+            subnum = Convert.ToInt64(Digits.Text.Substring(6, 2));
+
+            if (subnum >= 20)
+            {
+                str = str + GetTwenty(subnum / 10);
+                str = str + " " + GetTens(subnum % 10);
+                str = str + " Thousand ";
+            }
+            else if (subnum > 0)
+            {
+                str += GetTens(subnum);
+                str += " Thousand ";
+            }
+
+            subnum = Convert.ToInt64(Digits.Text.Substring(8, 1));
+            if (subnum >= 20)
+            {
+                str = str + GetTwenty(subnum / 10);
+                str = str + " " + GetTens(subnum % 10);
+                str = str + " Hundred ";
+            }
+            else if (subnum > 0)
+            {
+                str += GetTens(subnum);
+                str += " Hundred ";
+            }
+
+            subnum = Convert.ToInt64(Digits.Text.Substring(9, 2));
+
+            if (subnum >= 20)
+            {
+                str = str + GetTwenty(subnum / 10);
+                str = str + " " + GetTens(subnum % 10);
+                // str = str + " Rupees only "
+            }
+            else if (subnum > 0)
+            {
+                str += GetTens(subnum);
+                //str += " Rupees only "
+            }
+            str = str + " only ";
+        }
+        if (Digits.Text.Length == 9)
+        {
+            subnum = Convert.ToInt64(Digits.Text.Substring(1, 2));
+
+            if (subnum >= 20)
+            {
+                str = str + GetTwenty(subnum / 10);
+
+                str = str + " " + GetTens(subnum % 10);
+                str = str + " Crores ";
+            }
+            else if (subnum > 0)
+            {
+                str += GetTens(subnum);
+                str += " Crores ";
+            }
+            subnum = Convert.ToInt64(Digits.Text.Substring(3, 2));
+
+            if (subnum >= 20)
+            {
+                str = str + GetTwenty(subnum / 10);
+
+                str = str + " " + GetTens(subnum % 10);
+                str = str + " Lakhs ";
+            }
+            else if (subnum > 0)
+            {
+                str += GetTens(subnum);
+                str += " Lakhs ";
+            }
+
+            subnum = Convert.ToInt64(Digits.Text.Substring(5, 2));
+
+            if (subnum >= 20)
+            {
+                str = str + GetTwenty(subnum / 10);
+                str = str + " " + GetTens(subnum % 10);
+                str = str + " Thousand ";
+            }
+            else if (subnum > 0)
+            {
+                str += GetTens(subnum);
+                str += " Thousand ";
+            }
+
+            subnum = Convert.ToInt64(Digits.Text.Substring(7, 1));
+            if (subnum >= 20)
+            {
+                str = str + GetTwenty(subnum / 10);
+                str = str + " " + GetTens(subnum % 10);
+                str = str + " Hundred ";
+            }
+            else if (subnum > 0)
+            {
+                str += GetTens(subnum);
+                str += " Hundred ";
+            }
+
+            subnum = Convert.ToInt64(Digits.Text.Substring(8, 2));
+
+            if (subnum >= 20)
+            {
+                str = str + GetTwenty(subnum / 10);
+                str = str + " " + GetTens(subnum % 10);
+                //str = str + " Rupees only "
+            }
+            else if (subnum > 0)
+            {
+                str += GetTens(subnum);
+                // str += " Rupees only "
+            }
+            str = str + " only ";
+        }
+        if (Digits.Text.Length == 8)
+        {
+            subnum = Convert.ToInt64(Digits.Text.Substring(1, 1));
+
+            if (subnum >= 20)
+            {
+                str = str + GetTwenty(subnum / 10);
+
+                str = str + " " + GetTens(subnum % 10);
+                str = str + " Crores ";
+            }
+            else if (subnum > 0)
+            {
+                str += GetTens(subnum);
+                str += " Crores ";
+            }
+            subnum = Convert.ToInt64(Digits.Text.Substring(2, 2));
+
+            if (subnum >= 20)
+            {
+                str = str + GetTwenty(subnum / 10);
+
+                str = str + " " + GetTens(subnum % 10);
+                str = str + " Lakh ";
+            }
+            else if (subnum > 0)
+            {
+                str += GetTens(subnum);
+                str += " Lakh ";
+            }
+
+            subnum = Convert.ToInt64(Digits.Text.Substring(4, 2));
+
+            if (subnum >= 20)
+            {
+                str = str + GetTwenty(subnum / 10);
+                str = str + " " + GetTens(subnum % 10);
+                str = str + " Thousand ";
+            }
+            else if (subnum > 0)
+            {
+                str += GetTens(subnum);
+                str += " Thousand ";
+            }
+
+            subnum = Convert.ToInt64(Digits.Text.Substring(6, 1));
+            if (subnum >= 20)
+            {
+                str = str + GetTwenty(subnum / 10);
+                str = str + " " + GetTens(subnum % 10);
+                str = str + " Hundred ";
+            }
+            else if (subnum > 0)
+            {
+                str += GetTens(subnum);
+                str += " Hundred ";
+            }
+
+            subnum = Convert.ToInt64(Digits.Text.Substring(7, 2));
+
+            if (subnum >= 20)
+            {
+                str = str + GetTwenty(subnum / 10);
+                str = str + " " + GetTens(subnum % 10);
+                //str = str + " Rupees only "
+            }
+            else if (subnum > 0)
+            {
+                str += GetTens(subnum);
+                //str += " Rupees only "
+            }
+            str = str + " only ";
+        }
+        if (Digits.Text.Length == 7)
+        {
+            subnum = Convert.ToInt64(Digits.Text.Substring(1, 2));
+            if (subnum >= 20)
+            {
+                str = str + GetTwenty(subnum / 10);
+
+                str = str + " " + GetTens(subnum % 10);
+                str = str + " Lakh ";
+            }
+            else if (subnum > 0)
+            {
+                str += GetTens(subnum);
+                str += " Lakh ";
+            }
+
+            subnum = Convert.ToInt64(Digits.Text.Substring(3, 2));
+
+            if (subnum >= 20)
+            {
+                str = str + GetTwenty(subnum / 10);
+                str = str + " " + GetTens(subnum % 10);
+                str = str + " Thousand ";
+            }
+            else if (subnum > 0)
+            {
+                str += GetTens(subnum);
+                str += " Thousand ";
+            }
+
+            subnum = Convert.ToInt64(Digits.Text.Substring(5, 1));
+            if (subnum >= 20)
+            {
+                str = str + GetTwenty(subnum / 10);
+                str = str + " " + GetTens(subnum % 10);
+                str = str + " Hundred ";
+            }
+            else if (subnum > 0)
+            {
+                str += GetTens(subnum);
+                str += " Hundred ";
+            }
+
+            subnum = Convert.ToInt64(Digits.Text.Substring(6, 2));
+
+            if (subnum >= 20)
+            {
+                str = str + GetTwenty(subnum / 10);
+                str = str + " " + GetTens(subnum % 10);
+                //str = str + " Rupees only "
+            }
+            else if (subnum > 0)
+            {
+                str += GetTens(subnum);
+                //str += " Rupees only "
+            }
+            str = str + " only ";
+        }
+        if (Digits.Text.Length == 6)
+        {
+            subnum = Convert.ToInt64(Digits.Text.Substring(1, 1));
+
+            if (subnum >= 20)
+            {
+                str = str + GetTwenty(subnum / 10);
+
+                str = str + " " + GetTens(subnum % 10);
+                str = str + " Lakh ";
+            }
+            else if (subnum > 0)
+            {
+                str += GetTens(subnum);
+                str += " Lakh ";
+            }
+
+            subnum = Convert.ToInt64(Digits.Text.Substring(2, 2));
+
+            if (subnum >= 20)
+            {
+                str = str + GetTwenty(subnum / 10);
+                str = str + " " + GetTens(subnum % 10);
+                str = str + " Thousand ";
+            }
+            else if (subnum > 0)
+            {
+                str += GetTens(subnum);
+                str += " Thousand ";
+            }
+
+            subnum = Convert.ToInt64(Digits.Text.Substring(4, 1));
+            if (subnum >= 20)
+            {
+                str = str + GetTwenty(subnum / 10);
+                str = str + " " + GetTens(subnum % 10);
+                str = str + " Hundred ";
+            }
+            else if (subnum > 0)
+            {
+                str += GetTens(subnum);
+                str += " Hundred ";
+            }
+
+            subnum = Convert.ToInt64(Digits.Text.Substring(5, 2));
+
+            if (subnum >= 20)
+            {
+                str = str + GetTwenty(subnum / 10);
+                str = str + " " + GetTens(subnum % 10);
+                //str = str + " Rupees only "
+            }
+            else if (subnum > 0)
+            {
+                str += GetTens(subnum);
+                //str += " Rupees only "
+            }
+            str = str + " only ";
+        }
+        if (Digits.Text.Length == 5)
+        {
+            subnum = Convert.ToInt64(Digits.Text.Substring(1, 2));
+            if (subnum >= 20)
+            {
+                str = str + GetTwenty(subnum / 10);
+                str = str + " " + GetTens(subnum % 10);
+                str = str + " Thousand ";
+            }
+            else if (subnum > 0)
+            {
+                str += GetTens(subnum);
+                str += " Thousand ";
+            }
+
+            subnum = Convert.ToInt64(Digits.Text.Substring(3, 1));
+            if (subnum >= 20)
+            {
+                str = str + GetTwenty(subnum / 10);
+                str = str + " " + GetTens(subnum % 10);
+                str = str + " Hundred ";
+            }
+            else if (subnum > 0)
+            {
+                str += GetTens(subnum);
+                str += " Hundred ";
+            }
+
+            subnum = Convert.ToInt64(Digits.Text.Substring(4, 2));
+
+            if (subnum >= 20)
+            {
+                str = str + GetTwenty(subnum / 10);
+                str = str + " " + GetTens(subnum % 10);
+                //str = str + " Rupees only "
+            }
+            else if (subnum > 0)
+            {
+                str += GetTens(subnum);
+                //str += " Rupees only "
+            }
+            str = str + " only ";
+        }
+
+        if (Digits.Text.Length == 4)
+        {
+            subnum = Convert.ToInt64(Digits.Text.Substring(1, 1));
+            if (subnum >= 20)
+            {
+                str = str + GetTwenty(subnum / 10);
+                str = str + " " + GetTens(subnum % 10);
+                str = str + " Thousand ";
+            }
+            else if (subnum > 0)
+            {
+                str += GetTens(subnum);
+                str += " Thousand ";
+            }
+
+            subnum = Convert.ToInt64(Digits.Text.Substring(2, 1));
+            if (subnum >= 20)
+            {
+                str = str + GetTwenty(subnum / 10);
+                str = str + " " + GetTens(subnum % 10);
+                str = str + " Hundred ";
+            }
+            else if (subnum > 0)
+            {
+                str += GetTens(subnum);
+                str += " Hundred ";
+            }
+
+            subnum = Convert.ToInt64(Digits.Text.Substring(3, 2));
+
+            if (subnum >= 20)
+            {
+                str = str + GetTwenty(subnum / 10);
+                str = str + " " + GetTens(subnum % 10);
+                //str = str + " Rupees only "
+            }
+            else if (subnum > 0)
+            {
+                str += GetTens(subnum);
+                //str += " Rupees only "
+            }
+            str = str + " only ";
+
+        }
+        if (Digits.Text.Length == 3)
+        {
+            subnum = Convert.ToInt64(Digits.Text.Substring(1, 1));
+            if (subnum >= 20)
+            {
+                str = str + GetTwenty(subnum / 10);
+                str = str + " " + GetTens(subnum % 10);
+                str = str + " Hundred ";
+            }
+            else if (subnum > 0)
+            {
+                str += GetTens(subnum);
+                str += " Hundred ";
+            }
+
+            subnum = Convert.ToInt64(Digits.Text.Substring(2, 2));
+
+            if (subnum >= 20)
+            {
+                str = str + GetTwenty(subnum / 10);
+                str = str + " " + GetTens(subnum % 10);
+                //str = str + " Rupees only "
+            }
+            else if (subnum > 0)
+            {
+                str += GetTens(subnum);
+                //str += " Rupees only "
+            }
+            str = str + " only ";
+
+        }
+        if (Digits.Text.Length == 2 | Digits.Text.Length == 1)
+        {
+            subnum = Convert.ToInt64(Digits.Text.Substring(1, 2));
+            if (subnum >= 20)
+            {
+                str = str + GetTwenty(subnum / 10);
+                str = str + " " + GetTens(subnum % 10);
+                //str = str + " Rupees only "
+            }
+            else if (subnum > 0)
+            {
+                str += GetTens(subnum);
+                //str += " Rupees only "
+            }
+            str = str + " only ";
+        }
+        if (Digits.Text.Length == 0)
+        {
+            str = "";
+        }
+
+        return str;
+
+    }
+
+    public string GetTens(long num)
+    {
+        // ERROR: Not supported in C#: OnErrorStatement
+
+        switch ((num))
+        {
+            case 0:
+                return ("");
+            case 1:
+                return ("One");
+            case 2:
+                return ("Two");
+            case 3:
+                return ("Three");
+            case 4:
+                return ("Four");
+            case 5:
+                return ("Five");
+            case 6:
+                return ("Six");
+            case 7:
+                return ("Seven");
+            case 8:
+                return ("Eight");
+            case 9:
+                return ("Nine");
+            case 10:
+                return ("Ten");
+            case 11:
+                return ("Eleven");
+            case 12:
+                return ("Twelve");
+            case 13:
+                return ("Thirteen");
+            case 14:
+                return ("Fourteen");
+            case 15:
+                return ("Fifteen");
+            case 16:
+                return ("Sixteen");
+            case 17:
+                return ("Seventeen");
+            case 18:
+                return ("Eighteen");
+            case 19:
+
+                return ("Nineteen");
+        }
+
+        return ("");
+
+    }
+
+    public string GetTwenty(long num)
+    {
+        // ERROR: Not supported in C#: OnErrorStatement
+
+        switch ((num))
+        {
+            case 0:
+                return ("");
+            case 1:
+                return ("One");
+            case 2:
+                return ("Twenty");
+            case 3:
+                return ("Thirty");
+            case 4:
+                return ("Forty");
+            case 5:
+                return ("Fifty");
+            case 6:
+                return ("Sixty");
+            case 7:
+                return ("Seventy");
+            case 8:
+                return ("Eighty");
+            case 9:
+
+                return ("Ninety");
+        }
+        return ("");
+    }
+
+    public string GetSubInWords(long num)
+    {
+        // ERROR: Not supported in C#: OnErrorStatement
+
+        string str = null;
+        long subnum = 0;
+        TextBox Digits = new TextBox();
+        str = "";
+        Digits.Text = Convert.ToString(num);
+        if (Digits.Text.Length == 11)
+        {
+            subnum = Convert.ToInt64(Digits.Text.Substring(1, 2));
+
+            if (subnum >= 20)
+            {
+                str = str + GetTwenty(subnum / 10);
+
+                str = str + " " + GetTens(subnum % 10);
+                str = str + " Billion ";
+            }
+            else if (subnum > 0)
+            {
+                str += GetTens(subnum);
+                str += " Billion ";
+            }
+            subnum = Convert.ToInt64(Digits.Text.Substring(3, 2));
+
+            if (subnum >= 20)
+            {
+                str = str + GetTwenty(subnum / 10);
+
+                str = str + " " + GetTens(subnum % 10);
+                str = str + " Crores ";
+            }
+            else if (subnum > 0)
+            {
+                str += GetTens(subnum);
+                str += " Crores ";
+            }
+            subnum = Convert.ToInt64(Digits.Text.Substring(5, 2));
+
+            if (subnum >= 20)
+            {
+                str = str + GetTwenty(subnum / 10);
+
+                str = str + " " + GetTens(subnum % 10);
+                str = str + " Lakhs ";
+            }
+            else if (subnum > 0)
+            {
+                str += GetTens(subnum);
+                str += " Lakhs ";
+            }
+
+            subnum = Convert.ToInt64(Digits.Text.Substring(7, 2));
+
+            if (subnum >= 20)
+            {
+                str = str + GetTwenty(subnum / 10);
+                str = str + " " + GetTens(subnum % 10);
+                str = str + " Thousand ";
+            }
+            else if (subnum > 0)
+            {
+                str += GetTens(subnum);
+                str += " Thousand ";
+            }
+
+            subnum = Convert.ToInt64(Digits.Text.Substring(9, 1));
+            if (subnum >= 20)
+            {
+                str = str + GetTwenty(subnum / 10);
+                str = str + " " + GetTens(subnum % 10);
+                str = str + " Hundred ";
+            }
+            else if (subnum > 0)
+            {
+                str += GetTens(subnum);
+                str += " Hundred ";
+            }
+
+            subnum = Convert.ToInt64(Digits.Text.Substring(10, 2));
+
+            if (subnum >= 20)
+            {
+                str = str + GetTwenty(subnum / 10);
+                str = str + " " + GetTens(subnum % 10);
+
+            }
+            else if (subnum > 0)
+            {
+                str += GetTens(subnum);
+
+            }
+            str += " Billions And ";
+        }
+        if (Digits.Text.Length == 10)
+        {
+            subnum = Convert.ToInt64(Digits.Text.Substring(1, 1));
+
+            if (subnum >= 20)
+            {
+                str = str + GetTwenty(subnum / 10);
+
+                str = str + " " + GetTens(subnum % 10);
+                str = str + " Billion ";
+            }
+            else if (subnum > 0)
+            {
+                str += GetTens(subnum);
+                str += " Billion ";
+            }
+            subnum = Convert.ToInt64(Digits.Text.Substring(2, 2));
+
+            if (subnum >= 20)
+            {
+                str = str + GetTwenty(subnum / 10);
+
+                str = str + " " + GetTens(subnum % 10);
+                str = str + " Crores ";
+            }
+            else if (subnum > 0)
+            {
+                str += GetTens(subnum);
+                str += " Crores ";
+            }
+            subnum = Convert.ToInt64(Digits.Text.Substring(4, 2));
+
+            if (subnum >= 20)
+            {
+                str = str + GetTwenty(subnum / 10);
+
+                str = str + " " + GetTens(subnum % 10);
+                str = str + " Lakhs ";
+            }
+            else if (subnum > 0)
+            {
+                str += GetTens(subnum);
+                str += " Lakhs ";
+            }
+
+            subnum = Convert.ToInt64(Digits.Text.Substring(6, 2));
+
+            if (subnum >= 20)
+            {
+                str = str + GetTwenty(subnum / 10);
+                str = str + " " + GetTens(subnum % 10);
+                str = str + " Thousand ";
+            }
+            else if (subnum > 0)
+            {
+                str += GetTens(subnum);
+                str += " Thousand ";
+            }
+
+            subnum = Convert.ToInt64(Digits.Text.Substring(8, 1));
+            if (subnum >= 20)
+            {
+                str = str + GetTwenty(subnum / 10);
+                str = str + " " + GetTens(subnum % 10);
+                str = str + " Hundred ";
+            }
+            else if (subnum > 0)
+            {
+                str += GetTens(subnum);
+                str += " Hundred ";
+            }
+
+            subnum = Convert.ToInt64(Digits.Text.Substring(9, 2));
+
+            if (subnum >= 20)
+            {
+                str = str + GetTwenty(subnum / 10);
+                str = str + " " + GetTens(subnum % 10);
+
+            }
+            else if (subnum > 0)
+            {
+                str += GetTens(subnum);
+
+            }
+            str += " Billions And ";
+        }
+        if (Digits.Text.Length == 9)
+        {
+            subnum = Convert.ToInt64(Digits.Text.Substring(1, 2));
+
+            if (subnum >= 20)
+            {
+                str = str + GetTwenty(subnum / 10);
+
+                str = str + " " + GetTens(subnum % 10);
+                str = str + " Crores ";
+            }
+            else if (subnum > 0)
+            {
+                str += GetTens(subnum);
+                str += " Crores ";
+            }
+            subnum = Convert.ToInt64(Digits.Text.Substring(3, 2));
+
+            if (subnum >= 20)
+            {
+                str = str + GetTwenty(subnum / 10);
+
+                str = str + " " + GetTens(subnum % 10);
+                str = str + " Lakhs ";
+            }
+            else if (subnum > 0)
+            {
+                str += GetTens(subnum);
+                str += " Lakhs ";
+            }
+
+            subnum = Convert.ToInt64(Digits.Text.Substring(5, 2));
+
+            if (subnum >= 20)
+            {
+                str = str + GetTwenty(subnum / 10);
+                str = str + " " + GetTens(subnum % 10);
+                str = str + " Thousand ";
+            }
+            else if (subnum > 0)
+            {
+                str += GetTens(subnum);
+                str += " Thousand ";
+            }
+
+            subnum = Convert.ToInt64(Digits.Text.Substring(7, 1));
+            if (subnum >= 20)
+            {
+                str = str + GetTwenty(subnum / 10);
+                str = str + " " + GetTens(subnum % 10);
+                str = str + " Hundred ";
+            }
+            else if (subnum > 0)
+            {
+                str += GetTens(subnum);
+                str += " Hundred ";
+            }
+
+            subnum = Convert.ToInt64(Digits.Text.Substring(8, 2));
+
+            if (subnum >= 20)
+            {
+                str = str + GetTwenty(subnum / 10);
+                str = str + " " + GetTens(subnum % 10);
+
+            }
+            else if (subnum > 0)
+            {
+                str += GetTens(subnum);
+
+            }
+            str += " Billions And ";
+        }
+        if (Digits.Text.Length == 8)
+        {
+            subnum = Convert.ToInt64(Digits.Text.Substring(1, 1));
+
+            if (subnum >= 20)
+            {
+                str = str + GetTwenty(subnum / 10);
+
+                str = str + " " + GetTens(subnum % 10);
+                str = str + " Crores ";
+            }
+            else if (subnum > 0)
+            {
+                str += GetTens(subnum);
+                str += " Crores ";
+            }
+            subnum = Convert.ToInt64(Digits.Text.Substring(2, 2));
+
+            if (subnum >= 20)
+            {
+                str = str + GetTwenty(subnum / 10);
+
+                str = str + " " + GetTens(subnum % 10);
+                str = str + " Lakh ";
+            }
+            else if (subnum > 0)
+            {
+                str += GetTens(subnum);
+                str += " Lakh ";
+            }
+
+            subnum = Convert.ToInt64(Digits.Text.Substring(4, 2));
+
+            if (subnum >= 20)
+            {
+                str = str + GetTwenty(subnum / 10);
+                str = str + " " + GetTens(subnum % 10);
+                str = str + " Thousand ";
+            }
+            else if (subnum > 0)
+            {
+                str += GetTens(subnum);
+                str += " Thousand ";
+            }
+
+            subnum = Convert.ToInt64(Digits.Text.Substring(6, 1));
+            if (subnum >= 20)
+            {
+                str = str + GetTwenty(subnum / 10);
+                str = str + " " + GetTens(subnum % 10);
+                str = str + " Hundred ";
+            }
+            else if (subnum > 0)
+            {
+                str += GetTens(subnum);
+                str += " Hundred ";
+            }
+
+            subnum = Convert.ToInt64(Digits.Text.Substring(7, 2));
+
+            if (subnum >= 20)
+            {
+                str = str + GetTwenty(subnum / 10);
+                str = str + " " + GetTens(subnum % 10);
+
+            }
+            else if (subnum > 0)
+            {
+                str += GetTens(subnum);
+
+            }
+            str += " Billions And ";
+        }
+        if (Digits.Text.Length == 7)
+        {
+            subnum = Convert.ToInt64(Digits.Text.Substring(1, 2));
+            if (subnum >= 20)
+            {
+                str = str + GetTwenty(subnum / 10);
+
+                str = str + " " + GetTens(subnum % 10);
+                str = str + " Lakh ";
+            }
+            else if (subnum > 0)
+            {
+                str += GetTens(subnum);
+                str += " Lakh ";
+            }
+
+            subnum = Convert.ToInt64(Digits.Text.Substring(3, 2));
+
+            if (subnum >= 20)
+            {
+                str = str + GetTwenty(subnum / 10);
+                str = str + " " + GetTens(subnum % 10);
+                str = str + " Thousand ";
+            }
+            else if (subnum > 0)
+            {
+                str += GetTens(subnum);
+                str += " Thousand ";
+            }
+
+            subnum = Convert.ToInt64(Digits.Text.Substring(5, 1));
+            if (subnum >= 20)
+            {
+                str = str + GetTwenty(subnum / 10);
+                str = str + " " + GetTens(subnum % 10);
+                str = str + " Hundred ";
+            }
+            else if (subnum > 0)
+            {
+                str += GetTens(subnum);
+                str += " Hundred ";
+            }
+
+            subnum = Convert.ToInt64(Digits.Text.Substring(6, 2));
+
+            if (subnum >= 20)
+            {
+                str = str + GetTwenty(subnum / 10);
+                str = str + " " + GetTens(subnum % 10);
+                // str = str + " Billions And "
+            }
+            else if (subnum > 0)
+            {
+                str += GetTens(subnum);
+                //str += " Billions And "
+            }
+            str += " Billions And ";
+        }
+        if (Digits.Text.Length == 6)
+        {
+            subnum = Convert.ToInt64(Digits.Text.Substring(1, 1));
+
+            if (subnum >= 20)
+            {
+                str = str + GetTwenty(subnum / 10);
+
+                str = str + " " + GetTens(subnum % 10);
+                str = str + " Lakh ";
+            }
+            else if (subnum > 0)
+            {
+                str += GetTens(subnum);
+                str += " Lakh ";
+            }
+
+            subnum = Convert.ToInt64(Digits.Text.Substring(2, 2));
+
+            if (subnum >= 20)
+            {
+                str = str + GetTwenty(subnum / 10);
+                str = str + " " + GetTens(subnum % 10);
+                str = str + " Thousand ";
+            }
+            else if (subnum > 0)
+            {
+                str += GetTens(subnum);
+                str += " Thousand ";
+            }
+
+            subnum = Convert.ToInt64(Digits.Text.Substring(4, 1));
+            if (subnum >= 20)
+            {
+                str = str + GetTwenty(subnum / 10);
+                str = str + " " + GetTens(subnum % 10);
+                str = str + " Hundred ";
+            }
+            else if (subnum > 0)
+            {
+                str += GetTens(subnum);
+                str += " Hundred ";
+            }
+
+            subnum = Convert.ToInt64(Digits.Text.Substring(5, 2));
+
+            if (subnum >= 20)
+            {
+                str = str + GetTwenty(subnum / 10);
+                str = str + " " + GetTens(subnum % 10);
+                //str = str + " Billions And "
+            }
+            else if (subnum > 0)
+            {
+                str += GetTens(subnum);
+                //str += " Billions And "
+            }
+            str += " Billions And ";
+        }
+        if (Digits.Text.Length == 5)
+        {
+            subnum = Convert.ToInt64(Digits.Text.Substring(1, 2));
+            if (subnum >= 20)
+            {
+                str = str + GetTwenty(subnum / 10);
+                str = str + " " + GetTens(subnum % 10);
+                str = str + " Thousand ";
+            }
+            else if (subnum > 0)
+            {
+                str += GetTens(subnum);
+                str += " Thousand ";
+            }
+
+            subnum = Convert.ToInt64(Digits.Text.Substring(3, 1));
+            if (subnum >= 20)
+            {
+                str = str + GetTwenty(subnum / 10);
+                str = str + " " + GetTens(subnum % 10);
+                str = str + " Hundred ";
+            }
+            else if (subnum > 0)
+            {
+                str += GetTens(subnum);
+                str += " Hundred ";
+            }
+
+            subnum = Convert.ToInt64(Digits.Text.Substring(4, 2));
+
+            if (subnum >= 20)
+            {
+                str = str + GetTwenty(subnum / 10);
+                str = str + " " + GetTens(subnum % 10);
+                //str = str + " Billions And "
+            }
+            else if (subnum > 0)
+            {
+                str += GetTens(subnum);
+                //str += " Billions And "
+            }
+            str += " Billions And ";
+        }
+
+        if (Digits.Text.Length == 4)
+        {
+            subnum = Convert.ToInt64(Digits.Text.Substring(1, 1));
+            if (subnum >= 20)
+            {
+                str = str + GetTwenty(subnum / 10);
+                str = str + " " + GetTens(subnum % 10);
+                str = str + " Thousand ";
+            }
+            else if (subnum > 0)
+            {
+                str += GetTens(subnum);
+                str += " Thousand ";
+            }
+
+            subnum = Convert.ToInt64(Digits.Text.Substring(2, 1));
+            if (subnum >= 20)
+            {
+                str = str + GetTwenty(subnum / 10);
+                str = str + " " + GetTens(subnum % 10);
+                str = str + " Hundred ";
+            }
+            else if (subnum > 0)
+            {
+                str += GetTens(subnum);
+                str += " Hundred ";
+            }
+
+            subnum = Convert.ToInt64(Digits.Text.Substring(3, 2));
+
+            if (subnum >= 20)
+            {
+                str = str + GetTwenty(subnum / 10);
+                str = str + " " + GetTens(subnum % 10);
+                //str = str + " Billions And "
+            }
+            else if (subnum > 0)
+            {
+                str += GetTens(subnum);
+                //str += " Billions And "
+            }
+            str += " Billions And ";
+        }
+        if (Digits.Text.Length == 3)
+        {
+            subnum = Convert.ToInt64(Digits.Text.Substring(1, 1));
+            if (subnum >= 20)
+            {
+                str = str + GetTwenty(subnum / 10);
+                str = str + " " + GetTens(subnum % 10);
+                str = str + " Hundred ";
+            }
+            else if (subnum > 0)
+            {
+                str += GetTens(subnum);
+                str += " Hundred ";
+            }
+
+            subnum = Convert.ToInt64(Digits.Text.Substring(2, 2));
+
+            if (subnum >= 20)
+            {
+                str = str + GetTwenty(subnum / 10);
+                str = str + " " + GetTens(subnum % 10);
+                //str = str + " Billions And "
+            }
+            else if (subnum > 0)
+            {
+                str += GetTens(subnum);
+                //str += " Billions And "
+            }
+            str += " Billions And ";
+        }
+        if (Digits.Text.Length == 2 | Digits.Text.Length == 1)
+        {
+            subnum = Convert.ToInt64(Digits.Text.Substring(1, 2));
+            if (subnum >= 20)
+            {
+                str = str + GetTwenty(subnum / 10);
+                str = str + " " + GetTens(subnum % 10);
+                //str = str + " Billions And "
+            }
+            else if (subnum > 0)
+            {
+                str += GetTens(subnum);
+                //str += " Billions And "
+            }
+            str += " Billions And ";
+        }
+        if (Digits.Text.Length == 0)
+        {
+            str = "";
+        }
+
+        return str;
+    }
+
+    
+ 
+    public void HTMLToPdf(string HTML, string FilePath)
+    {
+        Document document = new Document();
+        PdfWriter.GetInstance(document, new FileStream(Request.PhysicalApplicationPath + "\\Doc1.pdf", FileMode.Create));
+        
+        document.Open();
+        iTextSharp.text.html.simpleparser.StyleSheet styles = new iTextSharp.text.html.simpleparser.StyleSheet();
+        iTextSharp.text.html.simpleparser.HTMLWorker hw = new iTextSharp.text.html.simpleparser.HTMLWorker(document);
+        hw.Parse(new StringReader(HTML));
+        document.Close();
+        ShowPdf("Doc1.pdf");
+
+        }
+
+
+    private void ShowPdf(string s)
+    {
+        Response.ClearContent();
+        Response.ClearHeaders();
+        Response.AddHeader("Content-Disposition", "inline;filename=" + s);
+        Response.ContentType = "application/pdf";
+        Response.WriteFile(s);
+        Response.Flush();
+        Response.Clear();
+    }
+
+    protected void btnprint_Click(object sender, EventArgs e)
+    {
+        Response.ContentType = "application/pdf";
+        Response.AddHeader("content-disposition", "attachment;filename=TestPage.pdf");
+        Response.Cache.SetCacheability(HttpCacheability.NoCache);
+        StringWriter sw = new StringWriter();
+        HtmlTextWriter hw = new HtmlTextWriter(sw);
+        pnlPerson.RenderControl(hw);
+        StringReader sr = new StringReader(sw.ToString());
+        Document pdfDoc = new Document(PageSize.A4, 10f, 10f, 100f, 0f);
+        HTMLWorker htmlparser = new HTMLWorker(pdfDoc);
+        PdfWriter.GetInstance(pdfDoc, Response.OutputStream);
+        pdfDoc.Open();
+        htmlparser.Parse(sr);
+        pdfDoc.Close();
+        Response.Write(pdfDoc);
+        Response.End();
+    
+
+        //try
+        //{
+        //    Response.ContentType = "application/pdf";
+        //    Response.AddHeader("content-disposition", "attachment;filename=Panel.pdf");
+        //    Response.Cache.SetCacheability(HttpCacheability.NoCache);
+        //    StringWriter sw = new StringWriter();
+        //    HtmlTextWriter hw = new HtmlTextWriter(sw);
+        //    pnlPerson.RenderControl(hw);
+        //    StringReader sr = new StringReader(sw.ToString());
+        //    Document pdfDoc = new Document(PageSize.A4, 10f, 10f, 100f, 0f);
+        //    HTMLWorker htmlparser = new HTMLWorker(pdfDoc);
+        //    PdfWriter.GetInstance(pdfDoc, Response.OutputStream);
+        //    pdfDoc.Open();
+        //    htmlparser.Parse(sr);
+        //    pdfDoc.Close();
+        //    Response.Write(pdfDoc);
+        //    Response.End();
+        //    //string HTMLCode = string.Empty;
+        //    //ConvertHTMLToPDF(HTMLCode);
+        //}
+        //catch (Exception ex)
+        //{
+
+        //}
+
+        //Document doc = new Document(PageSize.A4, 10f, 10f, 100f, 0f);
+        //string pdfFilePath = Server.MapPath(".") + "/PDFFiles";
+        //PdfWriter writer = PdfAWriter.GetInstance(doc, new FileStream(pdfFilePath + "/Default.pdf", FileMode.Create));
+        //doc.Open();
+        //try
+        //{
+        //    Paragraph paragraph = new Paragraph("Getting Started ITextSharp.");
+        //    string imageURL = Server.MapPath(".") + "/image2.jpg";
+        //    iTextSharp.text.Image jpg = iTextSharp.text.Image.GetInstance(imageURL);
+        //    //Resize image depend upon your need
+        //    jpg.ScaleToFit(140f, 120f);
+        //    //Give space before image
+        //    jpg.SpacingBefore = 10f;
+        //    //Give some space after the image
+        //    jpg.SpacingAfter = 1f;
+        //    jpg.Alignment = Element.ALIGN_LEFT;
+
+        //    doc.Add(paragraph);
+        //    doc.Add(jpg);
+
+        //}
+        //catch (Exception ex)
+        //{ }
+        //finally
+        //{
+        //    doc.Close();
+        //}
+
+    }
+
+    public override void VerifyRenderingInServerForm(Control control)
+    {
+        /* Verifies that the control is rendered */
+    }
+
+  
+   
+
+    public string getImage(string input)
+    {
+    if (input == null)
+    return string.Empty;
+    string tempInput = input;
+    string pattern = @"<img(.|\n)+?>";
+    string src = string.Empty;
+    HttpContext context = HttpContext.Current;
+
+    //Change the relative URL's to absolute URL's for an image, if any in the HTML code.
+    foreach (Match m in Regex.Matches(input, pattern, RegexOptions.IgnoreCase | RegexOptions.Multiline |
+
+    RegexOptions.RightToLeft))
+    {
+    if (m.Success)
+    {
+    string tempM = m.Value;
+    string pattern1 = "src=[\'|\"](.+?)[\'|\"]";
+    Regex reImg = new Regex(pattern1, RegexOptions.IgnoreCase | RegexOptions.Multiline);
+    Match mImg = reImg.Match(m.Value);
+
+    if (mImg.Success)
+    {
+    src = mImg.Value.ToLower().Replace("src=", "").Replace("\"", "");
+
+    if (src.ToLower().Contains("http://") == false)
+    {
+    //Insert new URL in img tag
+    src = "src=\"" + context.Request.Url.Scheme + "://" +
+    context.Request.Url.Authority + src + "\"";
+    try
+    {
+    tempM = tempM.Remove(mImg.Index, mImg.Length);
+    tempM = tempM.Insert(mImg.Index, src);
+
+    //insert new url img tag in whole html code
+    tempInput = tempInput.Remove(m.Index, m.Length);
+    tempInput = tempInput.Insert(m.Index, tempM);
+    }
+    catch (Exception e)
+    {
+
+    }
+    }
+    }
+    }
+    }
+    return tempInput;
+    }
+
+    string getSrc(string input)
+    {
+    string pattern = "src=[\'|\"](.+?)[\'|\"]";
+    System.Text.RegularExpressions.Regex reImg = new System.Text.RegularExpressions.Regex(pattern,
+    System.Text.RegularExpressions.RegexOptions.IgnoreCase |
+
+    System.Text.RegularExpressions.RegexOptions.Multiline);
+    System.Text.RegularExpressions.Match mImg = reImg.Match(input);
+    if (mImg.Success)
+    {
+    return mImg.Value.Replace("src=", "").Replace("\"", ""); ;
+    }
+
+    return string.Empty;
+    }
+  
+
+}
